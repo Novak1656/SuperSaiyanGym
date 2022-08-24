@@ -1,0 +1,18 @@
+{% extends 'auth_app/base_auth_app.html' %}
+
+{% block title %} Добро пожаловать {% endblock %}
+
+{% block content %}
+<div class="container">
+    <form method="post">
+        <div class="form-group">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" class="btn btn-info" value="Войти">
+        </div>
+    </form>
+    <div class="text-center border-top">
+        <a href="{% url 'password_reset' %}" class="btn btn-secondary">Забыл пароль</a>
+    </div>
+</div>
+{% endblock %}
