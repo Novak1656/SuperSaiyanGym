@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %} Страница модерации {% endblock %}
+
+{% block content %}
+<div class="container text-warning border-warning">
+    <h1 class="f-3 border-bottom border-warning mb-3 mt-3">Разделы модерации</h1>
+    <br>
+    <div class="text-center container">
+
+        <div class="row mb-2">
+            <button class="btn btn-outline-success btn-block btn-lg" data-bs-toggle="collapse" data-bs-target="#create_funcs">Create</button>
+            <div class="collapse" id="create_funcs">
+                <div class="bg-dark p-4 border-success border">
+                    <div class="row">
+                        <div class="col">
+                            <a href="{% url 'moder_create' %}?create_target=program" class="btn btn-outline-success btn-lg" >New Program</a>
+                        </div>
+                        <div class="col">
+                            <a href="{% url 'moder_create' %}?create_target=category" class="btn btn-outline-success btn-lg" >New Category</a>
+                        </div>
+                        <div class="col">
+                            <a href="{% url 'moder_create' %}?create_target=exercise" class="btn btn-outline-success btn-lg" >New Exercise</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-2">
+            <button class="btn btn-outline-info btn-block btn-lg" data-bs-toggle="collapse" data-bs-target="#update_funcs">Update</button>
+            <div class="collapse" id="update_funcs">
+                <div class="bg-dark p-4 border-info border">
+                    <div class="row">
+                        <div class="col">
+                            <a href="" class="btn btn-outline-info btn-lg" >Update Program</a>
+                        </div>
+                        <div class="col">
+                            <a href="" class="btn btn-outline-info btn-lg" >Update Category</a>
+                        </div>
+                        <div class="col">
+                            <a href="" class="btn btn-outline-info btn-lg" >Update Exercise</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-2">
+            <button class="btn btn-outline-danger btn-block btn-lg" data-bs-toggle="collapse" data-bs-target="#delete_funcs">Delete</button>
+            <div class="collapse" id="delete_funcs">
+                <div class="bg-dark p-4 border-danger border">
+                    <div class="row">
+                        <div class="col">
+                            <a href="" class="btn btn-outline-danger btn-lg" >Delete Program</a>
+                        </div>
+                        <div class="col">
+                            <a href="" class="btn btn-outline-danger btn-lg" >Delete Category</a>
+                        </div>
+                        <div class="col">
+                            <a href="" class="btn btn-outline-danger btn-lg" >Delete Exercise</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

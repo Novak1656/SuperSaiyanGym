@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -10,28 +11,34 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.js"></script>
     <title>{% block title %}{% endblock %}</title>
 </head>
-<body>
+
+<body class="bg-dark">
 
 <header>
     <nav class="navbar navbar-expand-xl navbar-dark bg-dark" aria-label="Sixth navbar example">
-        <div class="container-fluid container">
-            <a class="navbar-brand" href="#">Expand at xl</a>
+        <div class="container-fluid container border-bottom border-warning">
+            <a class="navbar-brand display-6" href="{% url 'main' %}">
+                <img src="{% static 'main/img/ss_gym_logo.png' %}" alt="404" width="50">
+                <span class="fs-3">SuperSaiyanGym</span>
+            </a>
             <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample06" aria-controls="navbarsExample06" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <div class="navbar-collapse collapse" id="navbarsExample06" style="">
                 <ul class="navbar-nav me-auto mb-2 mb-xl-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    <li class="nav-item mx-1">
+                        <a class="nav-link active" aria-current="page" href="{% url 'main' %}">Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Link</a>
+                    <li class="nav-item mx-1">
+                        <a class="nav-link" href="{% url 'program_list' %}">All programs</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link disabled">Disabled</a>
+                    {% if user.is_staff %}
+                    <li class="nav-item mx-1">
+                        <a class="nav-link" href="{% url 'moder' %}">Moderation</a>
                     </li>
-                    <li class="nav-item dropdown">
+                    {% endif %}
+                    <li class="nav-item dropdown mx-1">
                         <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Dropdown</a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="#">Action</a></li>
@@ -43,12 +50,61 @@
                 <form role="search" class="me-3">
                     <input class="form-control" type="search" placeholder="Search" aria-label="Search">
                 </form>
-                <div class="me-3">
-                    <a href="{% url 'profile' %}" class="btn btn-warning rounded">Profile</a>
-                </div>
-                <div>
-                <a href="{% url 'logout' %}" class="btn btn-warning rounded">Выход</a>
-                </div>
+
+                <div class="dropdown dropdown-center">
+                    <a class="btn btn-lg text-white text-decoration-none dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                        {% if user.avatar %}
+                        <img src="{{ user.avatar.url }}" class="rounded-circle"  height=40 width=40 alt="Image not found">
+                        {% else %}
+                        <img src="{% static 'authentication/img/avatar.jpg' %}" class="rounded-circle"  height=40 width=40 alt="Image not found">
+                        {% endif %}
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-dark mx-0 border-0 shadow" style="width: 220px;">
+                        <li>
+                            <a class="dropdown-item d-flex gap-2 align-items-center" href="{% url 'profile' %}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-bounding-box" viewBox="0 0 16 16">
+                                    <path d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 1-1 0v-3A1.5 1.5 0 0 1 1.5 0h3a.5.5 0 0 1 0 1h-3zM11 .5a.5.5 0 0 1 .5-.5h3A1.5 1.5 0 0 1 16 1.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 1-.5-.5zM.5 11a.5.5 0 0 1 .5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 1 0 1h-3A1.5 1.5 0 0 1 0 14.5v-3a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v3a1.5 1.5 0 0 1-1.5 1.5h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 1 .5-.5z"/>
+                                    <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                                </svg>
+                                Профиль
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex gap-2 align-items-center" href="{% url 'profile_config' %}?conf=user_info">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+                                    <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+                                    <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
+                                </svg>
+                                Настройки
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <button class="dropdown-item d-flex gap-2 align-items-center" data-bs-toggle="modal" data-bs-target="#exit">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-door-open-fill" viewBox="0 0 16 16">
+                                    <path d="M1.5 15a.5.5 0 0 0 0 1h13a.5.5 0 0 0 0-1H13V2.5A1.5 1.5 0 0 0 11.5 1H11V.5a.5.5 0 0 0-.57-.495l-7 1A.5.5 0 0 0 3 1.5V15H1.5zM11 2h.5a.5.5 0 0 1 .5.5V15h-1V2zm-2.5 8c-.276 0-.5-.448-.5-1s.224-1 .5-1 .5.448.5 1-.224 1-.5 1z"/>
+                                </svg>
+                                Выход
+                            </button>
+                        </li>
+                    </ul>
+
+                <!-- Modal Exit -->
+                    <div class="modal modal-alert " tabindex="-1" role="dialog" id="exit">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content rounded-4 shadow bg-warning text-dark">
+                                <div class="modal-body p-4 text-center">
+                                    <h5 class="mb-0">Вы действительно хотите выйти из аккаунта?</h5>
+                                </div>
+                                <div class="modal-footer flex-nowrap p-0 border-top border-dark">
+                                    <a type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0" href="{% url 'logout' %}">Yes</a>
+                                    <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0 border-left border-left-dark" data-bs-dismiss="modal">No</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <!-- Modal Exit -->
             </div>
         </div>
     </nav>
@@ -61,8 +117,8 @@
 </main>
 
 <footer class="text-muted py-5 bg-dark">
-    <div class="container">
-        <p class="float-start mb-1">©acclrtrrr</p>
+    <div class="container border-top border-warning">
+        <p class="float-start mb-1 mt-3">©acclrtrrr</p>
     </div>
 </footer>
 

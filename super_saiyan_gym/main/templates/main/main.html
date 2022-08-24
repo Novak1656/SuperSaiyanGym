@@ -1,7 +1,38 @@
 {% extends 'main/base_main.html' %}
+{% load static %}
 
 {% block title %}SuperSaiyan Gym{% endblock %}
 
 {% block content %}
+<div class="container">
+    <div class="pricing-header p-3 pb-md-4 mx-auto text-center text-warning border-bottom border-warning">
+        <div>
+            <img src="{% static 'main/img/ss_gym_logo_lg.png' %}" alt="" width="250">
+            <span class="display-1">SuperSaiyanGym</span>
+        </div>
 
+        <h1 class="display-4 fw-normal">Добро пожаловать</h1>
+        <p class="fs-5 text-muted">SuperSaiyanGym - сервис для людей ведущих или собирающихся вести здоровый образ жизни. Благодаря нашему веб-приложению вы сможете привести в себя в порядок за максимально короткий срок, всего лишь тренируясь по нашим тренировочным программам.</p>
+    </div>
+
+    <div class="container text-warning">
+        <h1 class="f-3 mt-3">Базовые тренировочные программы</h1>
+        <div class="row row-cols-1 row-cols-md-3 mb-3 text-center mt-5">
+        {% for program in train_programs %}
+        <div class="col">
+            <div class="card mb-4 rounded-3 shadow-sm bg-dark border-warning">
+                <div class="card-header py-3">
+                    <h4 class="my-0 fw-normal">{{ program.title }}</h4>
+                </div>
+                <div class="card-body">
+                    <h1 class="card-title pricing-card-title">{{ program.prise }} RUB<small class="text-muted fw-light">/mo</small></h1>
+                    <p>{{ program.description }}</p>
+                    <a type="button" class="w-100 btn btn-lg btn-outline-primary" href="{{ program.get_absolute_url }}">Подробнее</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    </div>
+</div>
 {% endblock %}

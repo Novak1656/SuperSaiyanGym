@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'main.apps.MainConfig',
     'user_profile.apps.UserProfileConfig',
+    'moder_app.apps.ModerAppConfig',
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,43 @@
+{% extends 'main/base_main.html' %}
+{% load static %}
+
+{% block title %}{{ program.title }}{% endblock %}
+
+{% block content %}
+<div class="container text-warning">
+    <h1 class="f-5 mb-2 mt-2">{{ program.title }}</h1>
+    <div class="rounded border border-warning">
+        <br>
+        <div class="container">
+            <ul>
+                <li><span>Кол-во занятий: {{ program.training_count }}</span></li>
+                <li><span>Занятий в неделю: {{ program.days_in_week }}</span></li>
+                <li><span>Кол-во подходов: {{ program.training_count }}</span></li>
+                <li><span>Кол-во повторений для каждого подхода: {{ program.retry_exercises }}</span></li>
+                <li><span>Цена: {{ program.prise }} руб.</span></li>
+            </ul>
+            <br>
+            <p>Описание: {{ program.description }}</p>
+            <br>
+            <div>
+                <h2>Упражнения:</h2>
+                {% for category, exercise in exercises.items %}
+                    <div class="row mb-2">
+                         <h2 class="f-5"><span class="badge bg-warning text-dark">{{ category }}</span> {{ exercise|join:", " }}</h2>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="container">
+                {% if user.train_program == program %}
+                    <a href="{% url 'end_training' %}" class="btn btn-block btn-danger">Пректратить тренировки</a>
+                {% else %}
+                <form action="{% url 'start_training' %}" method="get">
+                    <input type="text" hidden name="slug" value="{{ program.slug }}">
+                    <button type="submit" class="btn btn-block btn-success">Начать тренировки!</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
