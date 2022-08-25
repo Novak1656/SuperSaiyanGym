@@ -14,13 +14,13 @@
                 <div class="bg-dark p-4 border-success border">
                     <div class="row">
                         <div class="col">
-                            <a href="{% url 'moder_create' %}?create_target=program" class="btn btn-outline-success btn-lg" >New Program</a>
+                            <a href="{% url 'moder_create_program' %}" class="btn btn-outline-success btn-lg" >New Program</a>
                         </div>
                         <div class="col">
-                            <a href="{% url 'moder_create' %}?create_target=category" class="btn btn-outline-success btn-lg" >New Category</a>
+                            <a href="{% url 'moder_create_category' %}" class="btn btn-outline-success btn-lg" >New Category</a>
                         </div>
                         <div class="col">
-                            <a href="{% url 'moder_create' %}?create_target=exercise" class="btn btn-outline-success btn-lg" >New Exercise</a>
+                            <a href="{% url 'moder_create_exercise' %}" class="btn btn-outline-success btn-lg" >New Exercise</a>
                         </div>
                     </div>
                 </div>
@@ -32,14 +32,29 @@
             <div class="collapse" id="update_funcs">
                 <div class="bg-dark p-4 border-info border">
                     <div class="row">
-                        <div class="col">
-                            <a href="" class="btn btn-outline-info btn-lg" >Update Program</a>
+                        <div class="col dropdown">
+                            <a class="dropdown-toggle btn btn-outline-info btn-lg" href="#" data-bs-toggle="dropdown" aria-expanded="false">Update Program</a>
+                            <ul class="dropdown-menu dropdown-menu-dark">
+                                {% for program in program_list %}
+                                <li><a class="dropdown-item" href="{% url 'moder_update_program' program.id %}">{{ program.title }}</a></li>
+                                {% endfor %}
+                            </ul>
                         </div>
-                        <div class="col">
-                            <a href="" class="btn btn-outline-info btn-lg" >Update Category</a>
+                        <div class="col dropdown">
+                            <a class="dropdown-toggle btn btn-outline-info btn-lg" href="#" data-bs-toggle="dropdown" aria-expanded="false">Update Category</a>
+                            <ul class="dropdown-menu dropdown-menu-dark">
+                                {% for category in category_list %}
+                                <li><a class="dropdown-item" href="{% url 'moder_update_category' category.id %}">{{ category.title }}</a></li>
+                                {% endfor %}
+                            </ul>
                         </div>
-                        <div class="col">
-                            <a href="" class="btn btn-outline-info btn-lg" >Update Exercise</a>
+                        <div class="col dropdown">
+                            <a class="dropdown-toggle btn btn-outline-info btn-lg" href="#" data-bs-toggle="dropdown" aria-expanded="false">Update Exercise</a>
+                            <ul class="dropdown-menu dropdown-menu-dark">
+                                {% for exercise in exercise_list %}
+                                <li><a class="dropdown-item" href="{% url 'moder_update_exercise' exercise.id %}">{{ exercise.title }}</a></li>
+                                {% endfor %}
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -51,14 +66,29 @@
             <div class="collapse" id="delete_funcs">
                 <div class="bg-dark p-4 border-danger border">
                     <div class="row">
-                        <div class="col">
-                            <a href="" class="btn btn-outline-danger btn-lg" >Delete Program</a>
+                        <div class="col dropdown">
+                            <a class="dropdown-toggle btn btn-outline-danger btn-lg" href="#" data-bs-toggle="dropdown" aria-expanded="false">Delete Program</a>
+                            <ul class="dropdown-menu dropdown-menu-dark">
+                                {% for program in program_list %}
+                                <li><a class="dropdown-item" href="{% url 'moder_delete_program' program.id %}">{{ program.title }}</a></li>
+                                {% endfor %}
+                            </ul>
                         </div>
-                        <div class="col">
-                            <a href="" class="btn btn-outline-danger btn-lg" >Delete Category</a>
+                        <div class="col dropdown">
+                            <a class="dropdown-toggle btn btn-outline-danger btn-lg" href="#" data-bs-toggle="dropdown" aria-expanded="false">Delete Category</a>
+                            <ul class="dropdown-menu dropdown-menu-dark">
+                                {% for category in category_list %}
+                                <li><a class="dropdown-item" href="{% url 'moder_delete_category' category.id %}">{{ category.title }}</a></li>
+                                {% endfor %}
+                            </ul>
                         </div>
-                        <div class="col">
-                            <a href="" class="btn btn-outline-danger btn-lg" >Delete Exercise</a>
+                        <div class="col dropdown">
+                            <a class="dropdown-toggle btn btn-outline-danger btn-lg" href="#" data-bs-toggle="dropdown" aria-expanded="false">Delete Exercise</a>
+                            <ul class="dropdown-menu dropdown-menu-dark">
+                                {% for exercise in exercise_list %}
+                                <li><a class="dropdown-item" href="{% url 'moder_delete_exercise' exercise.id %}">{{ exercise.title }}</a></li>
+                                {% endfor %}
+                            </ul>
                         </div>
                     </div>
                 </div>

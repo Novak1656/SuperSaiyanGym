@@ -1,0 +1,12 @@
+<div class="col dropdown mb-3">
+    <a class="btn btn-outline-warning btn-block btn-lg w-100" href="#" data-bs-toggle="dropdown" aria-expanded="false">Categories</a>
+    <ul class="dropdown-menu dropdown-menu-dark w-100">
+        {% for category in category_list %}
+        <li>
+            <a class="dropdown-item" href="{% url 'exercises_category_list' category.title %}">
+                <h4>{{ category.title }} <span class="badge bg-danger text-white">{{ category.cnt }}</span></h4>
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>

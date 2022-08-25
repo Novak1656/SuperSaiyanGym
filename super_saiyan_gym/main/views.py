@@ -1,6 +1,9 @@
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 from django.shortcuts import render, redirect
-from .models import TrainingProgram
+from django.urls import reverse_lazy
+
+from .models import TrainingProgram, Exercises, ExercisesCategory
 from django.views.generic import DetailView, ListView
 
 
@@ -15,7 +18,7 @@ class TrainProgramDetail(DetailView):
     model = TrainingProgram
     template_name = 'main/program_detail.html'
     context_object_name = 'program'
-    login_url = 'auth/login/'
+    login_url = reverse_lazy('login')
 
     def get_queryset(self):
         return TrainingProgram.objects.prefetch_related('exercises').all()
@@ -34,7 +37,7 @@ class TrainProgramList(ListView):
     model = TrainingProgram
     template_name = 'main/programs_list.html'
     context_object_name = 'train_programs'
-    login_url = 'auth/login/'
+    login_url = reverse_lazy('login')
 
     def get_queryset(self):
         return TrainingProgram.objects.prefetch_related('exercises').all()
@@ -53,3 +56,40 @@ def end_training(request):
         user.train_program = None
         user.save()
     return redirect(request.META.get('HTTP_REFERER'))
+
+
+class ExercisesList(ListView):
+    model = Exercises
+    template_name = 'main/exercises_list.html'
+    context_object_name = 'exercises'
+    login_url = reverse_lazy('login')
+    paginate_by = 10
+
+    def get_queryset(self):
+        return Exercises.objects.select_related('category').all()
+
+
+class ExercisesByCategoryList(ListView):
+    model = Exercises
+    template_name = 'main/exercises_by_category_list.html'
+    context_object_name = 'exercises'
+    login_url = reverse_lazy('login')
+    paginate_by = 10
+
+    def get_queryset(self):
+        return Exercises.objects.select_related('category').filter(category__title=self.kwargs.get('cat_title')).all()
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(ExercisesByCategoryList, self).get_context_data(**kwargs)
+        context['category_title'] = self.kwargs.get('cat_title')
+        return context
+
+
+class ExercisesDetail(DetailView):
+    model = Exercises
+    template_name = 'main/exercises_detail.html'
+    login_url = reverse_lazy('login')
+    context_object_name = 'exercise'
+
+    def get_queryset(self):
+        return Exercises.objects.select_related('category').all()

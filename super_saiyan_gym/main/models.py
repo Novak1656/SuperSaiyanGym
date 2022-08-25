@@ -1,5 +1,7 @@
 from django.db import models
 from django.urls import reverse
+from django_unique_slugify import unique_slugify, slugify
+from unidecode import unidecode
 
 
 class ExercisesCategory(models.Model):
@@ -18,6 +20,7 @@ class Exercises(models.Model):
     title = models.CharField('Название', max_length=255)
     category = models.ForeignKey(verbose_name='Категория', to=ExercisesCategory,
                                  on_delete=models.CASCADE, related_name='exercises')
+    description = models.TextField('Описание', blank=True, null=True)
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
     updated_at = models.DateTimeField('Дата изменения', auto_now=True)
 
@@ -27,7 +30,7 @@ class Exercises(models.Model):
         ordering = ['category']
 
     def __str__(self):
-        return f"{self.category}: {self.title}"
+        return f"{self.title}"
 
 
 class TrainingProgram(models.Model):
@@ -52,3 +55,8 @@ class TrainingProgram(models.Model):
 
     def get_absolute_url(self):
         return reverse('program_detail', kwargs={'slug': self.slug})
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            unique_slugify(self, slugify(unidecode(self.title)))
+        super(TrainingProgram, self).save(*args, **kwargs)
