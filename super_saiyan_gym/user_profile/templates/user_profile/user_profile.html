@@ -1,6 +1,6 @@
 {% extends 'user_profile/base_user_profile.html' %}
 
-{% block title %}{{ request.user.username }}{% endblock %}
+{% block title %}{{ block.super }} | {{ request.user.username }}{% endblock %}
 
 {% block content %}
 <div class="container text-warning">
@@ -22,6 +22,7 @@
 
     <div>
         <a href="{% url 'profile_config' %}?conf=user_info" class="btn btn-info">Настройки</a>
+        <a href="{% url 'favorite_exercises' %}" class="btn btn-success">Избранные упражнения</a>
     </div>
 </div>
 {% endblock %}

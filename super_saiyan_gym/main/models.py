@@ -1,4 +1,5 @@
 from django.db import models
+from django.shortcuts import redirect
 from django.urls import reverse
 from django_unique_slugify import unique_slugify, slugify
 from unidecode import unidecode
@@ -21,6 +22,7 @@ class Exercises(models.Model):
     category = models.ForeignKey(verbose_name='Категория', to=ExercisesCategory,
                                  on_delete=models.CASCADE, related_name='exercises')
     description = models.TextField('Описание', blank=True, null=True)
+    like = models.IntegerField('Понравилось', default=0)
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
     updated_at = models.DateTimeField('Дата изменения', auto_now=True)
 
@@ -31,6 +33,9 @@ class Exercises(models.Model):
 
     def __str__(self):
         return f"{self.title}"
+
+    def get_absolute_url(self):
+        return reverse('exercises_detail', kwargs={'pk': self.pk})
 
 
 class TrainingProgram(models.Model):
@@ -60,3 +65,15 @@ class TrainingProgram(models.Model):
         if not self.pk:
             unique_slugify(self, slugify(unidecode(self.title)))
         super(TrainingProgram, self).save(*args, **kwargs)
+
+
+class MyFavorites(models.Model):
+    user = models.ForeignKey('auth_app.User', verbose_name='Пользователь',
+                             on_delete=models.CASCADE, related_name='favorite')
+    exercise = models.ForeignKey(Exercises, verbose_name='Упражнение',
+                                 on_delete=models.CASCADE, related_name='favorite')
+    category = models.CharField('Категория', max_length=255, default='Бицепс')
+
+    class Meta:
+        verbose_name = 'Избранное'
+        verbose_name_plural = 'Избранные'

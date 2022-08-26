@@ -1,0 +1,30 @@
+<div class="col dropdown mb-3">
+    <a class="btn btn-outline-warning btn-block btn-lg w-100" href="#" data-bs-toggle="dropdown" aria-expanded="false">Filtering by</a>
+    <ul class="dropdown-menu dropdown-menu-dark w-100">
+        {% for filter, label in filter_list %}
+        <li>
+            {% if filter == cur_filter %}
+            {% if search_word %}
+            <a class="dropdown-item active" href="{{ backup_url }}?search_word={{ search_word }}">
+                <h4>{{ label }}</h4>
+            </a>
+            {% else %}
+            <a class="dropdown-item active" href="{{ backup_url }}">
+                <h4>{{ label }}</h4>
+            </a>
+            {% endif %}
+            {% else %}
+            {% if search_word %}
+            <a class="dropdown-item" href="?filter_by={{ filter }}&search_word={{ search_word }}">
+                <h4>{{ label }}</h4>
+            </a>
+            {% else %}
+            <a class="dropdown-item" href="?filter_by={{ filter }}">
+                <h4>{{ label }}</h4>
+            </a>
+            {% endif %}
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+</div>

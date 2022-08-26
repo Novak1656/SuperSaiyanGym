@@ -21,10 +21,12 @@
                             </h2>
                         </div>
                         <div class="col text-end">
-                            <a href="{% url 'exercises_detail' exercise.pk %}" class="btn btn-outline-info btn-block w-100">Подробнее</a>
+                            <a href="{{ exercise.get_absolute_url }}" class="btn btn-outline-info btn-block w-100">Подробнее</a>
                         </div>
                     </div>
                 </div>
+                {% empty %}
+                {% if search_word %}<div class="text-center"><h1 class="f-6">По вашему запросу ничего не найдено</h1></div>{% endif %}
                 {% endfor %}
             </div>
             <div class="col border-start border-warning mt-3">
@@ -32,11 +34,12 @@
                     <h2 class="border-bottom text-center border-warning">Раздел упражнений</h2>
                     <br>
                     <h4>Всего упражнений: {{ page_obj.paginator.count }}</h4>
-                    <form role="search">
-                        <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+                    <form role="search" method="get" action="{% url 'exercises_search_list' %}">
+                        <input class="form-control" type="search" name="search_word" placeholder="Search" aria-label="Search">
                     </form>
                     <br>
                     {% get_category_list %}
+                    {% get_filter_list cur_filter backup_url search_word %}
                 </div>
             </div>
         </div>

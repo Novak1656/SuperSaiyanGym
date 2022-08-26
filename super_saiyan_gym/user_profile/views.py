@@ -3,8 +3,12 @@ import os
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
+from django.views.generic import ListView
+
 from .forms import UserInfoForm, UserLoginForm, UserEmailForm, UserAvatarForm
 from django.contrib.auth.forms import PasswordChangeForm
+from main.models import MyFavorites, Exercises
 
 
 @login_required
@@ -57,3 +61,20 @@ def profile_config(request):
                'conf_data': [('user_info', 'Общие сведенья'), ('login', 'Логин'), ('email', 'Электронная почта'),
                              ('password', 'Пароль'), ('avatar', 'Аватар')]}
     return render(request, 'user_profile/profile_config.html', context)
+
+
+class FavoriteList(ListView):
+    model = MyFavorites
+    template_name = 'user_profile/favorite_exercises.html'
+    context_object_name = 'exercise_list'
+    login_url = reverse_lazy('login')
+
+    def get_queryset(self):
+        return self.request.user.favorite.select_related('exercise').all()
+
+
+@login_required
+def delete_from_favorite(request, pk):
+    favorite = MyFavorites.objects.get(pk=pk)
+    favorite.delete()
+    return redirect('favorite_exercises')

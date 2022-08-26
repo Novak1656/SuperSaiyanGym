@@ -1,0 +1,22 @@
+{% extends 'user_profile/base_user_profile.html' %}
+
+{% block title %}Избранные упражнения{% endblock %}
+
+{% block content %}
+<div class="container text-warning">
+    <div class="container display-6">Мои избранные упражнения</div>
+    {% for item in exercise_list %}
+    <div class="row mb-2 mt-3">
+        <button class="btn btn-outline-warning btn-block btn-lg" data-bs-toggle="collapse" data-bs-target="#exe{{ item.exercise.id }}">Название: {{ item.exercise.title }} <span class="badge bg-warning text-dark">Категория: {{ item.category }}</span></button>
+        <div class="collapse" id="exe{{ item.exercise.id }}">
+            <div class="bg-dark p-4 border-warning border">
+                <h1>Описание: </h1>
+                <p>{{ item.exercise.description }}</p>
+                <br>
+                <a href="{% url 'delete_from_favorite' item.pk %}" class="btn btn-danger btn-block">Удалить из избранных</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
