@@ -2,18 +2,22 @@ import os
 
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView
 
 from .forms import UserInfoForm, UserLoginForm, UserEmailForm, UserAvatarForm
 from django.contrib.auth.forms import PasswordChangeForm
-from main.models import MyFavorites, Exercises
+from main.models import MyFavorites, TrainingProgram
 
 
 @login_required
 def profile(request):
-    return render(request, 'user_profile/user_profile.html')
+    context = {}
+    if request.user.training.all().exists():
+        context['training'] = request.user.training.select_related('train_program').first()
+    return render(request, 'user_profile/user_profile.html', context)
 
 
 @login_required
@@ -70,7 +74,17 @@ class FavoriteList(ListView):
     login_url = reverse_lazy('login')
 
     def get_queryset(self):
+        if self.request.GET.get('category'):
+            return self.request.user.favorite.filter(category=self.request.GET.get('category'))\
+                .select_related('exercise').all()
         return self.request.user.favorite.select_related('exercise').all()
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(FavoriteList, self).get_context_data(**kwargs)
+        context['categories'] = self.request.user.favorite.values_list('category', flat=True).distinct()
+        if self.request.GET.get('category'):
+            context['category_section'] = self.request.GET.get('category')
+        return context
 
 
 @login_required

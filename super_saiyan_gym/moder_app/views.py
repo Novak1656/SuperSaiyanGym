@@ -36,7 +36,7 @@ class ModerCreateCategoryView(AccessMixin, CreateView):
     model = ExercisesCategory
     template_name = 'moder_app/moder_create.html'
     form_class = CategoryForm
-    success_url = reverse_lazy('program_list')
+    success_url = reverse_lazy('exercises_list')
     login_url = reverse_lazy('login')
     extra_context = {'page_title': 'категории упражнений'}
 
@@ -50,7 +50,7 @@ class ModerCreateExerciseView(AccessMixin, CreateView):
     model = Exercises
     template_name = 'moder_app/moder_create.html'
     form_class = ExerciseForm
-    success_url = reverse_lazy('program_list')
+    success_url = reverse_lazy('exercises_list')
     login_url = reverse_lazy('login')
     extra_context = {'page_title': 'упражнения'}
 
@@ -82,7 +82,7 @@ class ModerUpdateProgram(AccessMixin, UpdateView):
 class ModerUpdateCategory(AccessMixin, UpdateView):
     model = ExercisesCategory
     template_name = 'moder_app/moder_update.html'
-    success_url = reverse_lazy('program_list')
+    success_url = reverse_lazy('exercises_list')
     login_url = reverse_lazy('login')
     form_class = CategoryForm
     extra_context = {'page_title': 'категории упражнений'}
@@ -101,7 +101,7 @@ class ModerUpdateCategory(AccessMixin, UpdateView):
 class ModerUpdateExercise(AccessMixin, UpdateView):
     model = Exercises
     template_name = 'moder_app/moder_update.html'
-    success_url = reverse_lazy('program_list')
+    success_url = reverse_lazy('exercises_list')
     login_url = reverse_lazy('login')
     form_class = ExerciseForm
     extra_context = {'page_title': 'упражнения'}

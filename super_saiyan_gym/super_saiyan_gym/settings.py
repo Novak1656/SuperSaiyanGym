@@ -28,9 +28,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'debug_toolbar',
+    'django_apscheduler',
     'main.apps.MainConfig',
     'user_profile.apps.UserProfileConfig',
     'moder_app.apps.ModerAppConfig',
+    'training_app.apps.TrainingAppConfig',
 ]
 
 MIDDLEWARE = [
@@ -140,3 +142,6 @@ EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
 
 LOGIN_URL = 'login'
+
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+SCHEDULER_DEFAULT = True

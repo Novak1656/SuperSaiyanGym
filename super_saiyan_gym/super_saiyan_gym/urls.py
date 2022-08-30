@@ -9,6 +9,7 @@ urlpatterns = [
     path('', include('main.urls')),
     path('profile/', include('user_profile.urls')),
     path('moderation/', include('moder_app.urls')),
+    path('dojo/', include('training_app.urls')),
 ]
 
 if settings.DEBUG:

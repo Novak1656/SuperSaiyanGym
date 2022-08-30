@@ -28,7 +28,7 @@
                 {% endfor %}
             </div>
             <div class="container">
-                {% if user.train_program == program %}
+                {% if training %}
                     <a href="{% url 'end_training' %}" class="btn btn-block btn-danger">Пректратить тренировки</a>
                 {% else %}
                 <form action="{% url 'start_training' %}" method="get">

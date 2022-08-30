@@ -30,6 +30,8 @@ class TrainProgramDetail(DetailView):
         for exercise in query:
             exercises[exercise.category].append(exercise.title)
         context['exercises'] = exercises
+        if self.request.user.training.all().exists():
+            context['training'] = self.request.user.training.select_related('train_program').first()
         return context
 
 
@@ -41,21 +43,6 @@ class TrainProgramList(ListView):
 
     def get_queryset(self):
         return TrainingProgram.objects.prefetch_related('exercises').all()
-
-
-def start_training(request):
-    user = request.user
-    user.train_program = TrainingProgram.objects.get(slug=request.GET.get('slug'))
-    user.save()
-    return redirect('profile')
-
-
-def end_training(request):
-    if request.user.train_program:
-        user = request.user
-        user.train_program = None
-        user.save()
-    return redirect(request.META.get('HTTP_REFERER'))
 
 
 class ExercisesList(ListView):

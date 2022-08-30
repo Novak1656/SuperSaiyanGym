@@ -5,8 +5,28 @@
 {% block content %}
 <div class="container text-warning">
     <div class="container display-6">Мои избранные упражнения</div>
+    <div class="container mt-3 mb-3">
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                {% if not category_section %}
+                <a class="nav-link text-dark bg-warning border-dark border-bottom-0 active" aria-current="page" href="{% url 'favorite_exercises' %}">All</a>
+                {% else %}
+                <a class="nav-link text-white" aria-current="page" href="{% url 'favorite_exercises' %}">All</a>
+                {% endif %}
+            </li>
+            {% for category in categories %}
+            <li class="nav-item">
+                {% if category == category_section %}
+                <a class="nav-link text-dark bg-warning border-dark border-bottom-0 active" aria-current="page" href="{% url 'favorite_exercises' %}?category={{ category }}">{{ category }}</a>
+                {% else %}
+                <a class="nav-link text-white" aria-current="page" href="{% url 'favorite_exercises' %}?category={{ category }}">{{ category }}</a>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
     {% for item in exercise_list %}
-    <div class="row mb-2 mt-3">
+    <div class="row mb-3 mt-3 container">
         <button class="btn btn-outline-warning btn-block btn-lg" data-bs-toggle="collapse" data-bs-target="#exe{{ item.exercise.id }}">Название: {{ item.exercise.title }} <span class="badge bg-warning text-dark">Категория: {{ item.category }}</span></button>
         <div class="collapse" id="exe{{ item.exercise.id }}">
             <div class="bg-dark p-4 border-warning border">
@@ -16,6 +36,10 @@
                 <a href="{% url 'delete_from_favorite' item.pk %}" class="btn btn-danger btn-block">Удалить из избранных</a>
             </div>
         </div>
+    </div>
+    {% empty %}
+    <div class="container text-center display-6">
+        Вы не добавили ни одного упражнения в избранное.
     </div>
     {% endfor %}
 </div>

@@ -15,8 +15,8 @@
         <h2 class="f-5">Пол: {{ request.user.sex }}</h2>
         <h2 class="f-5">Вес: {{ request.user.weight }} kg.</h2>
         <h2 class="f-5">Рост: {{ request.user.height }} sm.</h2>
-        {% if request.user.train_program %}
-        <h2 class="f-5">Тренеровочная программа: {{ request.user.train_program.title }}</h2>
+        {% if training %}
+        <h2 class="f-5">Тренеровочная программа: {{ training.train_program.title }}</h2>
         {% endif %}
     </div>
 
