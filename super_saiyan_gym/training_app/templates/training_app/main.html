@@ -8,13 +8,29 @@
         <h1 class="display-6">Додзё</h1>
     </div>
     <br>
+    {% if training.exists %}
     <div class="container rounded border-warning border text-warning">
         <h1 class="display-6">Сегодняшняя тренировка</h1>
         <br>
+        {% if today_training %}
+        <div class="container">
+            <h2 class="display-6 text-center">Сегодня у вас тренировка на следующие группы мышц:</h2>
+            <p class="fs-2 text-center mt-3">
+            {% for category in today_training.exercises.all %}
+            <span class="badge bg-warning text-dark">{{ category.title }}</span>
+            {% endfor %}
+            </p>
+        </div>
+        <div class="mt-5 mb-5 text-center border-top container border-warning w-50">
+            <a href="" class="btn btn-outline-warning btn-lg mt-4">Начать тренеровку</a>
+        </div>
+        {% else %}
         <h2 class="text-center mb-3">Сегодня тренировок нет!</h2>
+        {% endif %}
     </div>
     <br>
     <div class="container rounded border-warning border text-warning">
+        {% if schedules %}
         <div class="position-relative">
             <h1 class="display-6">Расписание
                 {% if user.training.first.mailing %}
@@ -25,8 +41,8 @@
                 </a>
                 {% else %}
                 <a type="button" class="text-warning position-absolute top-0 end-0 mt-2 me-2" data-bs-toggle="modal" data-bs-target="#start_mailing">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-bell" viewBox="0 0 16 16">
-                        <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-bell-slash-fill" viewBox="0 0 16 16">
+                        <path d="M5.164 14H15c-1.5-1-2-5.902-2-7 0-.264-.02-.523-.06-.776L5.164 14zm6.288-10.617A4.988 4.988 0 0 0 8.995 2.1a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 7c0 .898-.335 4.342-1.278 6.113l9.73-9.73zM10 15a2 2 0 1 1-4 0h4zm-9.375.625a.53.53 0 0 0 .75.75l14.75-14.75a.53.53 0 0 0-.75-.75L.625 15.625z"/>
                     </svg>
                 </a>
                 {% endif %}
@@ -80,6 +96,12 @@
                 <div class="card mb-3 bg-dark border border-warning rounded">
                     <div class="card-body">
                         <div class="card-header border-warning mb-3">
+                            <a type="button" class="text-warning position-absolute top-0 end-0 mt-2 me-2" href="{% url 'update_schedule' schedule.pk %}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                    <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                    <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                                </svg>
+                            </a>
                             <h5 class="card-title text-center">{{ schedule.day }}</h5>
                         </div>
                         {% for category in schedule.exercises.all %}
@@ -105,6 +127,14 @@
             </div>
             {% endfor %}
         </div>
+        {% else %}
+        <div>
+            <h1 class="display-6">Расписание</h1>
+        </div>
+        <div class="container text-warning text-center">
+            <a href="{% url 'training_conf' %}" class="btn btn-outline-warning btn-lg mb-5">Составить расписание тренировок</a>
+        </div>
+        {% endif %}
     </div>
 
     <br>
@@ -112,19 +142,41 @@
     <div class="container rounded border-warning border text-warning">
         <h1 class="display-6">Достижения</h1>
         <br>
+        <div class="container">
+            <table class="table text-warning">
+                <thead>
+                <tr>
+                    <th scope="col">Упражнение</th>
+                    <th scope="col">Показатели</th>
+                    <th scope="col">Последнее изменение</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for category in categories %}
+                <tr>
+                    <td colspan="3"><h2 class="fs-2 mt-3">{{ category }}:</h2></td>
+                </tr>
+                {% for achievement in achievements %}
+                {% if achievement.exercise.category.title == category %}
+                <tr>
+                    <td>{{ achievement.exercise.title }}</td>
+                    <td>{{ achievement.achieve_param }}</td>
+                    <td>{{ achievement.updated_at|date:"d.m.Y" }}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
+    {% else %}
+    <div class="container text-warning text-center">
+        <h1 class="display-6">Чтобы пользоваться возможностями Додзё выберите один из представленных тренировочных программ!</h1>
+        <a href="{% url 'program_list' %}" class="btn btn-outline-warning btn-lg mt-5">Перейти к списку программ</a>
+    </div>
+    {% endif %}
 
 
 </div>
 {% endblock %}
-
-Сегодняшняя тренировка
-
-
-Начать тренировку
-после выполнения отображаемого упражнения нажимается кнопка далее и отображается следующее упражнение
-время начала и конца тренировки запоминается и в кноце выводится результат
-
-Достижения
-пользователь указывает сколько он веса берёт на каждое упражнение
-при переходе на другую программу данные достижений будут переносится

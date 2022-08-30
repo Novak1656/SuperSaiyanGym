@@ -1,0 +1,37 @@
+{% extends 'user_profile/base_user_profile.html' %}
+
+{% block title %}Мои достижения{% endblock %}
+
+{% block content %}
+<div class="container rounded border-warning border text-warning">
+    <h1 class="display-6">Достижения</h1>
+    <br>
+    <div class="container">
+        <table class="table text-warning">
+            <thead>
+            <tr>
+                <th scope="col">Упражнение</th>
+                <th scope="col">Показатели</th>
+                <th scope="col">Последнее изменение</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for category in categories %}
+            <tr>
+                <td colspan="3"><h2 class="fs-2 mt-3">{{ category }}:</h2></td>
+            </tr>
+            {% for achievement in achievements %}
+            {% if achievement.exercise.category.title == category %}
+            <tr>
+                <td>{{ achievement.exercise.title }}</td>
+                <td>{{ achievement.achieve_param }}</td>
+                <td>{{ achievement.updated_at|date:"d.m.Y" }}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

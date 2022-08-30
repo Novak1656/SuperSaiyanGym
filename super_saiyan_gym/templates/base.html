@@ -27,7 +27,7 @@
             </button>
 
             <div class="navbar-collapse collapse" id="navbarsExample06" style="">
-                <ul class="navbar-nav me-auto mb-2 mb-xl-0">
+                <ul class="navbar-nav me-auto mb-2 mb-xl-0 justify-content-center mx-auto">
                     <li class="nav-item mx-1">
                         <a class="nav-link active" aria-current="page" href="{% url 'main' %}">Home</a>
                     </li>
@@ -46,20 +46,18 @@
                         <a class="nav-link" href="{% url 'exercises_list' %}">Exercises</a>
                     </li>
                 </ul>
-                <form role="search" class="me-3">
-                    <input class="form-control" type="search" placeholder="Search" aria-label="Search">
-                </form>
+
 
                 <div class="dropdown dropdown-center">
                     <a class="btn btn-lg text-white text-decoration-none dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
                         {% if user.avatar %}
-                        <img src="{{ user.avatar.url }}" class="rounded-circle"  height=40 width=40 alt="Image not found">
+                        <img src="{{ user.avatar.url }}" class="rounded-circle border border-warning border-2"  height=40 width=40 alt="Image not found">
                         {% else %}
                         <img src="{% static 'authentication/img/avatar.jpg' %}" class="rounded-circle"  height=40 width=40 alt="Image not found">
                         {% endif %}
                     </a>
 
-                    <ul class="dropdown-menu dropdown-menu-dark mx-0 border-0 shadow" style="width: 220px;">
+                    <ul class="dropdown-menu dropdown-menu-dark mx-0 border-0 shadow">
                         <li>
                             <a class="dropdown-item d-flex gap-2 align-items-center" href="{% url 'profile' %}">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
@@ -74,6 +72,15 @@
                                     <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
                                 </svg>
                                 Избранное
+                            </a>
+                        </li>
+                        <li>
+                            <a href="" class="dropdown-item d-flex gap-2 align-items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-award-fill" viewBox="0 0 16 16">
+                                    <path d="m8 0 1.669.864 1.858.282.842 1.68 1.337 1.32L13.4 6l.306 1.854-1.337 1.32-.842 1.68-1.858.282L8 12l-1.669-.864-1.858-.282-.842-1.68-1.337-1.32L2.6 6l-.306-1.854 1.337-1.32.842-1.68L6.331.864 8 0z"/>
+                                    <path d="M4 11.794V16l4-1 4 1v-4.206l-2.018.306L8 13.126 6.018 12.1 4 11.794z"/>
+                                </svg>
+                                Достижения
                             </a>
                         </li>
                         <li>

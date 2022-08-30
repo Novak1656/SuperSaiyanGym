@@ -10,6 +10,7 @@ from django.views.generic import ListView
 from .forms import UserInfoForm, UserLoginForm, UserEmailForm, UserAvatarForm
 from django.contrib.auth.forms import PasswordChangeForm
 from main.models import MyFavorites, TrainingProgram
+from training_app.models import Achievements
 
 
 @login_required
@@ -85,6 +86,16 @@ class FavoriteList(ListView):
         if self.request.GET.get('category'):
             context['category_section'] = self.request.GET.get('category')
         return context
+
+
+class AchievementsList(ListView):
+    model = Achievements
+    context_object_name = 'achievements'
+    template_name = 'user_profile/achievements_list.html'
+    login_url = reverse_lazy('login')
+
+    def get_queryset(self):
+        return self.request.user.achievements.all()
 
 
 @login_required
