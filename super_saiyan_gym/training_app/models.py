@@ -31,6 +31,7 @@ class Schedules(models.Model):
     training = models.ForeignKey(verbose_name='Тренировка', to=Training, on_delete=models.CASCADE, related_name='schedules')
     day = models.CharField('День недели', choices=DAYS, max_length=255)
     exercises = models.ManyToManyField(verbose_name='Упражнения', to=ExercisesCategory, related_name='schedules')
+    complete = models.BooleanField('Выполнено', default=0)
 
     class Meta:
         verbose_name = 'Расписание'
@@ -62,7 +63,7 @@ class Achievements(models.Model):
 class TrainingProcess(models.Model):
     user = models.ForeignKey(verbose_name='Пользователь', to=User, on_delete=models.CASCADE,
                              related_name='train_process')
-    started_at = models.TimeField('Время начала', auto_now_add=True)
+    started_at = models.DateTimeField('Время начала', auto_now_add=True)
 
     class Meta:
         verbose_name = 'Процесс тренировки'

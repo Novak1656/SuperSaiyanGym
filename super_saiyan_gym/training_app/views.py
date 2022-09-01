@@ -1,17 +1,19 @@
+import pytz
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core import serializers
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mass_mail
 from django.db.models import Q
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
-
+from django.utils import timezone
 from .models import Training, TrainingProgram, ExercisesCategory, Schedules, Achievements, Exercises, TrainingProcess, ExerciseLvlUp
-from .forms import ScheduleForm, BaseArticleFormSet, AchievementsForm
+from .forms import ScheduleForm, BaseArticleFormSet
 from django.forms import formset_factory
-from datetime import datetime
+from datetime import datetime, timedelta
 
 """
 1.Начать тренировку
@@ -33,6 +35,10 @@ from datetime import datetime
 5. Добавить в модель Расписание поле выполнено.
 
 6. В разделе сегодняшняя тренеровка если она выполнена то выводить результаты тренеровки, результаты сохраняются 1 день.
+
+7. Каждую неделю мета выполнено сбрасывается с расписаний
+
+8. Хранить в лвл апе объект упражнения вместо ид
 """
 
 
@@ -67,40 +73,75 @@ def dojo(request):
 
 @login_required
 def training_process_start(request):
-    today_training = Schedules.objects.select_related('training').prefetch_related('exercises').filter(
-        Q(training__user=request.user) & Q(day=Schedules.DAYS[datetime.now().date().weekday()][0])).first().\
-        exercises.all().values_list('exercises__category', flat=True).distinct()
+    today_schedule = Schedules.objects.select_related('training').prefetch_related('exercises').filter(
+        Q(training__user=request.user) & Q(day=Schedules.DAYS[datetime.now().date().weekday()][0]) & Q(complete=False)).first()
+    if not today_schedule:
+        raise Http404()
+    today_training = today_schedule.exercises.all().values_list('exercises__category', flat=True).distinct()
     categories = ExercisesCategory.objects.filter(id__in=today_training).values_list('title', flat=True)
     TrainingProcess.objects.create(user=request.user)
+    request.session['categories_list'] = [title for title in categories]
     return render(request, 'training_app/start_training.html', {'categories': categories})
 
 
 @login_required
 def training_process_steps(request, category):
-    query = request.user.achievements.select_related('exercise').prefetch_related('exercise__category').filter(
+    if request.META['HTTP_REFERER'] != f"http://{request.META['HTTP_HOST']}/training/start/":
+        raise Http404()
+    achievements = request.user.achievements.select_related('exercise').prefetch_related('exercise__category').filter(
         exercise__category__title=category).all()
-    AchievementsFormSet = formset_factory(AchievementsForm, extra=len(query), max_num=len(query))
+    categories_list = request.session.get('categories_list')
+    categories_list.remove(category)
+    print(categories_list)
     if request.method == 'POST':
-        formset = AchievementsFormSet(request.POST, queryset=query)
-        print(formset)
-        if formset.is_valid():
-            for form in formset:
-                achieve = form(instance=Achievements.objects.get(form.cleaned_data['id']))
-                print(achieve)
-                # if achieve.achieve_param < form.cleaned_data['achieve_param']:
-                #     ExerciseLvlUp.objects.create()
-                # achieve.achieve_param =
-                #return redirect('in_training', category=category)
-    else:
-        formset = AchievementsFormSet(initial=[{'achieve_param': item.achieve_param} for item in query])
-    exercises = [(i + 1, item.exercise, item.achieve_param) for i, item in enumerate(query)]
-    context = {'exercises': exercises, 'category': category, 'category_list': '', 'formset': formset}
+        train_proc = TrainingProcess.objects.filter(user=request.user).first()
+        for key, value in request.POST.items():
+            if key != 'csrfmiddlewaretoken':
+                if float(value) < 0:
+                    messages.error(request, 'Показатели выполнения упражнений должны быть положительными!')
+                else:
+                    achieve = achievements.get(pk=key.split('_')[1])
+                    if achieve.achieve_param < float(value):
+                        ExerciseLvlUp.objects.create(training_process=train_proc, exercise_id=achieve.exercise_id,
+                                                     old_achieve_param=achieve.achieve_param, new_achieve_param=value)
+        if len(categories_list) == 0:
+            return redirect('training_process_finish')
+        category = categories_list[0]
+        request.session['categories_list'] = categories_list
+        request.session.modified = True
+        return redirect('in_training', category=category)
+    context = {'achievements': achievements, 'category': category, 'category_list': categories_list}
     return render(request, 'training_app/in_training.html', context)
 
 
 @login_required
 def training_process_finish(request):
-    return render(request, 'training_app/in_training.html')
+    training_proc = TrainingProcess.objects.prefetch_related('exerciselvlup').filter(user=request.user).first()
+    if not training_proc:
+        raise Http404()
+    cur_time = timezone.localtime(timezone.now()).time()
+    start_time = timezone.localtime(training_proc.started_at, pytz.timezone(settings.TIME_ZONE)).time()
+    cur_strptime = datetime.strptime(f"{cur_time.hour}:{cur_time.minute}:{cur_time.second}", "%H:%M:%S")
+    start_strptime = datetime.strptime(f"{start_time.hour}:{start_time.minute}:{start_time.second}", "%H:%M:%S")
+    time_end = cur_strptime - start_strptime
+
+    lvl_ups = training_proc.exerciselvlup.all()
+    exercises = Exercises.objects.select_related('category').filter(id__in=lvl_ups.values_list('exercise_id'))
+    # хранить ид тренировочного процесса в сессии
+    results = [(exercises.get(pk=item.exercise_id), item.old_achieve_param, item.new_achieve_param) for item in lvl_ups]
+
+    achievements = request.user.achievements.select_related('exercise').filter(exercise_id__in=lvl_ups.values_list('exercise_id')).all()
+    for achieve in achievements:
+        for item in lvl_ups:
+            if item.exercise_id == achieve.exercise_id:
+                achieve.achieve_param = item.new_achieve_param
+                achieve.save()
+                break
+    schedules = Schedules.objects.select_related('training').filter(Q(training__user=request.user) & Q(day=Schedules.DAYS[datetime.now().date().weekday()][0])).first()
+    schedules.complete = True
+    schedules.save()
+    context = {'time_end': time_end, 'exercises': exercises, 'lvl_ups': lvl_ups, 'results': results}
+    return render(request, 'training_app/training_results.html', context)
 
 
 @login_required
@@ -112,7 +153,9 @@ def update_schedule(request, pk):
         if request.POST.get('day') in days:
             messages.error(request, 'Выберите разные дни для тренировок!')
         if form.is_valid():
-            form.save()
+            schedule = form.save(commit=False)
+            schedule.complete = False
+            schedule.save()
             return redirect('dojo')
     else:
         form = ScheduleForm(instance=schedule)
@@ -135,7 +178,7 @@ def training_conf(request):
                 schedule.training = Training.objects.filter(user=request.user).first()
                 schedule.save()
                 form.save_m2m()
-            return redirect('profile')
+            return redirect('dojo')
     else:
         formset = ScheduleFormSet(form_kwargs={'exercises_list': exercises_list})
     return render(request, 'training_app/training_conf.html', {'formset': formset})

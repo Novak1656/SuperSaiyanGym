@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load training_tags %}
+
 
 {% block title %} Тренировка | Этап: {{ category }} {% endblock %}
 
@@ -14,29 +16,31 @@
         </div>
         <br>
         <form method="post">
+            {% for message in messages %}
+            {% if message.tag == error %}<li class="alert text-danger">{{ message }}</li>{% endif %}
+            {% endfor %}
             <div class="container w-50 mt-3">
-                {% for i, exercise, achieve_param in exercises %}
+                {% for achievement in achievements %}
                 <div class="row mb-3">
-                    <button type="button" class="btn btn-outline-warning btn-block btn-lg" data-bs-toggle="collapse" data-bs-target="#exercise{{ exercise.id }}">{{ exercise.title }}</button>
-                    <div class="collapse" id="exercise{{ exercise.id }}">
+                    <button type="button" class="btn btn-outline-warning btn-block btn-lg" data-bs-toggle="collapse" data-bs-target="#exercise{{ achievement.exercise.id }}">{{ achievement.exercise.title }}</button>
+                    <div class="collapse" id="exercise{{ achievement.exercise.id }}">
                         <div class="bg-dark p-4 border-warning border">
                             <div class="row">
                                 <div class="col">
                                     <p class="fs-5">Описание техники упражнения:</p>
                                     <p>
-                                        {{ exercise.description }}
+                                        {{ achievement.exercise.description }}
                                     </p>
                                 </div>
                                 <div class="col-2 border-start border-warning">
                                     {% csrf_token %}
-                                    {{ formset.management_form }}
+
                                     <span>Текущий показатель:</span>
-                                    <p>{{ achieve_param }} kg.</p>
-                                    {% for form in formset %}
-                                    {% if forloop.counter == i %}
-                                    {{ form.as_p }}
-                                    {% endif %}
-                                    {% endfor %}
+                                    <p>{{ achievement.achieve_param }} kg.</p>
+                                    <p>
+                                        <label>Новый показатель:</label>
+                                        <input type="number" name="achieve_{{ achievement.id }}" value="{{ achievement.achieve_param|float_filter }}" class="form-control" step="0.01">
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -44,7 +48,7 @@
                 </div>
                 {% endfor %}
                 <div class="container w-50 text-center mt-5 mb-5 border-top border-warning">
-                    {% if category_list|length == 1 %}
+                    {% if category_list|length == 0 %}
                     <input type="submit" class="btn btn-outline-success btn-lg mt-3" value="Завершить тренеровку">
                     {% else %}
                     <input type="submit" class="btn btn-outline-success btn-lg mt-3" value="Перейти к следующему этапу">

@@ -17,8 +17,7 @@ class BaseArticleFormSet(forms.BaseFormSet):
 class ScheduleForm(forms.ModelForm):
     def __init__(self, exercises_list=None, *args, **kwargs):
         super(ScheduleForm, self).__init__(*args, **kwargs)
-        if not self.instance:
-            self.fields['exercises'].queryset = exercises_list
+        self.fields['exercises'].queryset = exercises_list
 
     class Meta:
         model = Schedules
@@ -30,12 +29,3 @@ class ScheduleForm(forms.ModelForm):
             queryset=ExercisesCategory.objects.all(),
             widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-control'})
         )
-
-
-class AchievementsForm(forms.ModelForm):
-    class Meta:
-        model = Achievements
-        fields = ('achieve_param',)
-        widgets = {
-            'achieve_param': forms.NumberInput(attrs={'class': 'form-control'})
-        }

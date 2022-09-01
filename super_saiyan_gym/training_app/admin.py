@@ -11,9 +11,9 @@ class TrainingAdmin(admin.ModelAdmin):
 
 @admin.register(Schedules)
 class SchedulesAdmin(admin.ModelAdmin):
-    list_display = ('id', 'training', 'day',)
+    list_display = ('id', 'training', 'day', 'complete',)
     list_display_links = ('id',)
-    list_filter = ('training', 'day',)
+    list_filter = ('training', 'day', 'complete',)
 
 
 @admin.register(Achievements)
