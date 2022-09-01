@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %} Начало тренировки {% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="text-warning border-bottom border-warning">
+        <h1 class="display-6">Начало тренировки</h1>
+    </div>
+    <br>
+    <div class="container rounded border-warning border text-warning">
+        <h1 class="display-6 text-center mt-3">С какой группы мышц начать тренировку?</h1>
+        <br>
+        <div class="container border-top border-warning text-center w-50">
+            <h2 class="fs-2 text-center mt-4 mb-4 text-warning">
+            {% for category in categories %}
+            <a href="{% url 'in_training' category %}" class="btn btn-outline-warning btn-lg">{{ category }}</a>
+            {% endfor %}
+            </h2>
+        </div>
+    </div>
+</div>
+{% endblock %}

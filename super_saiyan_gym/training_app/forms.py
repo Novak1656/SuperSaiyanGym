@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Schedules, ExercisesCategory
+from .models import Schedules, ExercisesCategory, Achievements
 
 
 class BaseArticleFormSet(forms.BaseFormSet):
@@ -30,3 +30,12 @@ class ScheduleForm(forms.ModelForm):
             queryset=ExercisesCategory.objects.all(),
             widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-control'})
         )
+
+
+class AchievementsForm(forms.ModelForm):
+    class Meta:
+        model = Achievements
+        fields = ('achieve_param',)
+        widgets = {
+            'achieve_param': forms.NumberInput(attrs={'class': 'form-control'})
+        }

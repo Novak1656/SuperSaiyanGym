@@ -95,7 +95,12 @@ class AchievementsList(ListView):
     login_url = reverse_lazy('login')
 
     def get_queryset(self):
-        return self.request.user.achievements.all()
+        return self.request.user.achievements.select_related('exercise').prefetch_related('exercise__category').all()
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(AchievementsList, self).get_context_data(**kwargs)
+        context['categories'] = self.object_list.values_list('exercise__category__title', flat=True).distinct()
+        return context
 
 
 @login_required

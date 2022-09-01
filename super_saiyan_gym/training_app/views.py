@@ -6,8 +6,10 @@ from django.core.mail import send_mass_mail
 from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Training, TrainingProgram, ExercisesCategory, Schedules, Achievements, Exercises
-from .forms import ScheduleForm, BaseArticleFormSet
+from django.urls import reverse_lazy
+
+from .models import Training, TrainingProgram, ExercisesCategory, Schedules, Achievements, Exercises, TrainingProcess, ExerciseLvlUp
+from .forms import ScheduleForm, BaseArticleFormSet, AchievementsForm
 from django.forms import formset_factory
 from datetime import datetime
 
@@ -15,18 +17,22 @@ from datetime import datetime
 1.Начать тренировку
 после выполнения отображаемого упражнения нажимается кнопка далее и отображается следующее упражнение
 время начала и конца тренировки запоминается и в кноце выводится результат
-Создать модель БД в которую будут заносится промежуточные данные во время тренировки:
++Создать модель БД в которую будут заносится промежуточные данные во время тренировки:
 - время начала и конца тренеровки
-- упражнения параметрыы достижений, которых были увеличены в ходе тренировки
+- упражнения параметры достижений, которых были увеличены в ходе тренировки
 
 2.В профиле добавить разделы:
--общие достижения
++-общие достижения
 -список программ по которым проходили тренировки (дата начала тренировок по программе и дата конца)
 
 3.Реализовать функцию подбора программы по следующим параметрам: рост, вес, возраст
 Добавить программам категорию: похудение, набор массы, стандартный, фитнес
 
-4.Реализовать возможность пользоваттелям создавать кастомные программы
+4.Реализовать возможность пользователям создавать кастомные программы
+
+5. Добавить в модель Расписание поле выполнено.
+
+6. В разделе сегодняшняя тренеровка если она выполнена то выводить результаты тренеровки, результаты сохраняются 1 день.
 """
 
 
@@ -60,7 +66,40 @@ def dojo(request):
 
 
 @login_required
-def training_process(request):
+def training_process_start(request):
+    today_training = Schedules.objects.select_related('training').prefetch_related('exercises').filter(
+        Q(training__user=request.user) & Q(day=Schedules.DAYS[datetime.now().date().weekday()][0])).first().\
+        exercises.all().values_list('exercises__category', flat=True).distinct()
+    categories = ExercisesCategory.objects.filter(id__in=today_training).values_list('title', flat=True)
+    TrainingProcess.objects.create(user=request.user)
+    return render(request, 'training_app/start_training.html', {'categories': categories})
+
+
+@login_required
+def training_process_steps(request, category):
+    query = request.user.achievements.select_related('exercise').prefetch_related('exercise__category').filter(
+        exercise__category__title=category).all()
+    AchievementsFormSet = formset_factory(AchievementsForm, extra=len(query), max_num=len(query))
+    if request.method == 'POST':
+        formset = AchievementsFormSet(request.POST, queryset=query)
+        print(formset)
+        if formset.is_valid():
+            for form in formset:
+                achieve = form(instance=Achievements.objects.get(form.cleaned_data['id']))
+                print(achieve)
+                # if achieve.achieve_param < form.cleaned_data['achieve_param']:
+                #     ExerciseLvlUp.objects.create()
+                # achieve.achieve_param =
+                #return redirect('in_training', category=category)
+    else:
+        formset = AchievementsFormSet(initial=[{'achieve_param': item.achieve_param} for item in query])
+    exercises = [(i + 1, item.exercise, item.achieve_param) for i, item in enumerate(query)]
+    context = {'exercises': exercises, 'category': category, 'category_list': '', 'formset': formset}
+    return render(request, 'training_app/in_training.html', context)
+
+
+@login_required
+def training_process_finish(request):
     return render(request, 'training_app/in_training.html')
 
 

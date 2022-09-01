@@ -1,10 +1,57 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-</body>
-</html>
+{% block title %} Тренировка | Этап: {{ category }} {% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="text-warning border-bottom border-warning">
+        <h1 class="display-6">Список упражнений на текущий этап тренеровки</h1>
+    </div>
+    <br>
+    <div class="container rounded border-warning border text-warning">
+        <div class="border-warning border-bottom mt-3 text-center">
+            <h1 class="display-6">Упражнения на {{ category|lower }}:</h1>
+        </div>
+        <br>
+        <form method="post">
+            <div class="container w-50 mt-3">
+                {% for i, exercise, achieve_param in exercises %}
+                <div class="row mb-3">
+                    <button type="button" class="btn btn-outline-warning btn-block btn-lg" data-bs-toggle="collapse" data-bs-target="#exercise{{ exercise.id }}">{{ exercise.title }}</button>
+                    <div class="collapse" id="exercise{{ exercise.id }}">
+                        <div class="bg-dark p-4 border-warning border">
+                            <div class="row">
+                                <div class="col">
+                                    <p class="fs-5">Описание техники упражнения:</p>
+                                    <p>
+                                        {{ exercise.description }}
+                                    </p>
+                                </div>
+                                <div class="col-2 border-start border-warning">
+                                    {% csrf_token %}
+                                    {{ formset.management_form }}
+                                    <span>Текущий показатель:</span>
+                                    <p>{{ achieve_param }} kg.</p>
+                                    {% for form in formset %}
+                                    {% if forloop.counter == i %}
+                                    {{ form.as_p }}
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                <div class="container w-50 text-center mt-5 mb-5 border-top border-warning">
+                    {% if category_list|length == 1 %}
+                    <input type="submit" class="btn btn-outline-success btn-lg mt-3" value="Завершить тренеровку">
+                    {% else %}
+                    <input type="submit" class="btn btn-outline-success btn-lg mt-3" value="Перейти к следующему этапу">
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
