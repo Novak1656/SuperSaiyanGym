@@ -2,43 +2,27 @@ import pytz
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core import serializers
-from django.core.exceptions import ValidationError
 from django.core.mail import send_mass_mail
 from django.db.models import Q
-from django.http import Http404, JsonResponse
+from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse_lazy
 from django.utils import timezone
 from .models import Training, TrainingProgram, ExercisesCategory, Schedules, Achievements, Exercises, TrainingProcess, ExerciseLvlUp
 from .forms import ScheduleForm, BaseArticleFormSet
 from django.forms import formset_factory
-from datetime import datetime, timedelta
+from datetime import datetime
 
 """
-1.Начать тренировку
-после выполнения отображаемого упражнения нажимается кнопка далее и отображается следующее упражнение
-время начала и конца тренировки запоминается и в кноце выводится результат
-+Создать модель БД в которую будут заносится промежуточные данные во время тренировки:
-- время начала и конца тренеровки
-- упражнения параметры достижений, которых были увеличены в ходе тренировки
-
-2.В профиле добавить разделы:
-+-общие достижения
--список программ по которым проходили тренировки (дата начала тренировок по программе и дата конца)
-
-3.Реализовать функцию подбора программы по следующим параметрам: рост, вес, возраст
+1. Реализовать функцию подбора программы по следующим параметрам: рост, вес, возраст
 Добавить программам категорию: похудение, набор массы, стандартный, фитнес
 
-4.Реализовать возможность пользователям создавать кастомные программы
+2. Реализовать возможность пользователям создавать кастомные программы.
+ в разделе модерации добавить раздел для просмотра предложки программ.
+ создать модель бд предложки программ.
 
-5. Добавить в модель Расписание поле выполнено.
+3. В разделе сегодняшняя тренеровка если она выполнена то выводить результаты тренеровки, результаты сохраняются 1 день.
 
-6. В разделе сегодняшняя тренеровка если она выполнена то выводить результаты тренеровки, результаты сохраняются 1 день.
-
-7. Каждую неделю мета выполнено сбрасывается с расписаний
-
-8. Хранить в лвл апе объект упражнения вместо ид
+4. Вынесити запуск асинхронных задач в отдельный management command
 """
 
 
@@ -52,6 +36,20 @@ def mailing():
             mail_list += ('Не пропустите сегодняшнюю тренировку!', message, settings.EMAIL_HOST_USER, [train.user.email]),
     send_mass_mail(mail_list, fail_silently=False)
     print("Рассылка выполнена")
+
+
+def clean_training_process():
+    TrainingProcess.objects.filter(started_at__date__lt=timezone.localtime(timezone.now()).date()).delete()
+    print('Список тренеровочных процессов очищен')
+
+
+def reload_users_schedules():
+    Schedules.objects.filter(complete=True).all().update(complete=False)
+    print('Расписание пользователей откатилось')
+
+
+def get_data(datetime_obj):
+    return datetime.strptime(f"{datetime_obj.hour}:{datetime_obj.minute}:{datetime_obj.second}", "%H:%M:%S")
 
 
 @login_required
@@ -86,13 +84,17 @@ def training_process_start(request):
 
 @login_required
 def training_process_steps(request, category):
-    if request.META['HTTP_REFERER'] != f"http://{request.META['HTTP_HOST']}/training/start/":
+    today_schedule = Schedules.objects.select_related('training').prefetch_related('exercises').filter(
+        Q(training__user=request.user) & Q(day=Schedules.DAYS[datetime.now().date().weekday()][0]) & Q(
+            complete=False)).first()
+    if not today_schedule:
         raise Http404()
+    exercise_list = request.user.training.select_related('train_program').prefetch_related('train_program__exercises')\
+        .values_list('train_program__exercises', flat=True)
     achievements = request.user.achievements.select_related('exercise').prefetch_related('exercise__category').filter(
-        exercise__category__title=category).all()
+        Q(exercise__category__title=category) & Q(exercise_id__in=exercise_list)).all()
     categories_list = request.session.get('categories_list')
     categories_list.remove(category)
-    print(categories_list)
     if request.method == 'POST':
         train_proc = TrainingProcess.objects.filter(user=request.user).first()
         for key, value in request.POST.items():
@@ -102,7 +104,7 @@ def training_process_steps(request, category):
                 else:
                     achieve = achievements.get(pk=key.split('_')[1])
                     if achieve.achieve_param < float(value):
-                        ExerciseLvlUp.objects.create(training_process=train_proc, exercise_id=achieve.exercise_id,
+                        ExerciseLvlUp.objects.create(training_process=train_proc, exercise=achieve.exercise,
                                                      old_achieve_param=achieve.achieve_param, new_achieve_param=value)
         if len(categories_list) == 0:
             return redirect('training_process_finish')
@@ -116,32 +118,27 @@ def training_process_steps(request, category):
 
 @login_required
 def training_process_finish(request):
-    training_proc = TrainingProcess.objects.prefetch_related('exerciselvlup').filter(user=request.user).first()
+    training_proc = TrainingProcess.objects.select_related('user').prefetch_related('exerciselvlup').filter(
+        user=request.user).first()
     if not training_proc:
         raise Http404()
     cur_time = timezone.localtime(timezone.now()).time()
     start_time = timezone.localtime(training_proc.started_at, pytz.timezone(settings.TIME_ZONE)).time()
-    cur_strptime = datetime.strptime(f"{cur_time.hour}:{cur_time.minute}:{cur_time.second}", "%H:%M:%S")
-    start_strptime = datetime.strptime(f"{start_time.hour}:{start_time.minute}:{start_time.second}", "%H:%M:%S")
-    time_end = cur_strptime - start_strptime
-
-    lvl_ups = training_proc.exerciselvlup.all()
-    exercises = Exercises.objects.select_related('category').filter(id__in=lvl_ups.values_list('exercise_id'))
-    # хранить ид тренировочного процесса в сессии
-    results = [(exercises.get(pk=item.exercise_id), item.old_achieve_param, item.new_achieve_param) for item in lvl_ups]
-
-    achievements = request.user.achievements.select_related('exercise').filter(exercise_id__in=lvl_ups.values_list('exercise_id')).all()
+    time_end = get_data(cur_time) - get_data(start_time)
+    lvl_ups = ExerciseLvlUp.objects.select_related('exercise').filter(training_process=training_proc).all()
+    achievements = request.user.achievements.select_related('exercise').filter(
+        exercise_id__in=lvl_ups.values_list('exercise_id', flat=True)).all()
     for achieve in achievements:
         for item in lvl_ups:
-            if item.exercise_id == achieve.exercise_id:
+            if item.exercise == achieve.exercise:
                 achieve.achieve_param = item.new_achieve_param
                 achieve.save()
                 break
-    schedules = Schedules.objects.select_related('training').filter(Q(training__user=request.user) & Q(day=Schedules.DAYS[datetime.now().date().weekday()][0])).first()
-    schedules.complete = True
-    schedules.save()
-    context = {'time_end': time_end, 'exercises': exercises, 'lvl_ups': lvl_ups, 'results': results}
-    return render(request, 'training_app/training_results.html', context)
+    Schedules.objects.select_related('training').filter(
+        Q(training__user=request.user)
+        & Q(day=Schedules.DAYS[datetime.now().date().weekday()][0]))\
+        .update(complete=True)
+    return render(request, 'training_app/training_results.html', {'time_end': time_end, 'lvl_ups': lvl_ups})
 
 
 @login_required

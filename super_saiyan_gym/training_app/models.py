@@ -77,7 +77,8 @@ class TrainingProcess(models.Model):
 class ExerciseLvlUp(models.Model):
     training_process = models.ForeignKey(verbose_name='Тренировочный процесс', to=TrainingProcess,
                                          on_delete=models.CASCADE, related_name='exerciselvlup')
-    exercise_id = models.IntegerField('Упражнение')
+    exercise = models.ForeignKey(verbose_name='Упражнение', to=Exercises,
+                                 on_delete=models.CASCADE, related_name='exerciselvlup', null=True)
     old_achieve_param = models.DecimalField('Старые показатели', max_digits=5, decimal_places=2)
     new_achieve_param = models.DecimalField('Новые показатели', max_digits=5, decimal_places=2)
 
@@ -87,4 +88,4 @@ class ExerciseLvlUp(models.Model):
         ordering = ['-pk']
 
     def __str__(self):
-        return f"{self.training_process}"
+        return f"{self.pk}"

@@ -18,19 +18,19 @@
             <h1 class="display-6">Повышение показателей:</h1>
             <br>
             <ul>
-                {% for exercise, old_achieve, new_achieve in results %}
+                {% for lvl_up in lvl_ups %}
                 <li class="mb-3">
                     <div class="row">
                         <div class="col border-end border-warning">
-                            <h2 class="fs-2"><span class="badge bg-warning text-dark fs-3">{{exercise.category.title}}</span> {{exercise.title}}</h2>
+                            <h2 class="fs-2"><span class="badge bg-warning text-dark fs-3"></span> {{ lvl_up.exercise.title }}</h2>
                         </div>
                        <div class="col-8 text-center">
                            <h2 class="fs-3">
-                           {{old_achieve}}kg.
+                           {{ lvl_up.old_achieve_param }}kg.
                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
                                <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
                            </svg>
-                           {{new_achieve}}kg.
+                           {{ lvl_up.new_achieve_param }}kg.
                            </h2>
                        </div>
                     </div>

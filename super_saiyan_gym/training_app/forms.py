@@ -17,7 +17,8 @@ class BaseArticleFormSet(forms.BaseFormSet):
 class ScheduleForm(forms.ModelForm):
     def __init__(self, exercises_list=None, *args, **kwargs):
         super(ScheduleForm, self).__init__(*args, **kwargs)
-        self.fields['exercises'].queryset = exercises_list
+        if exercises_list:
+            self.fields['exercises'].queryset = exercises_list
 
     class Meta:
         model = Schedules

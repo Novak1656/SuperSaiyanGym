@@ -17,8 +17,32 @@
 
             {% for form in formset %}
             {% csrf_token %}
-            {{ form.as_p }}
+            <p>{{ form.day.label }}:</p>
+            <p>{{ form.day }}</p>
+
+            <p>{{ form.exercises.label }}:</p>
+            {{ form.exercises }}
+            <br>
+<!--            <p>-->
+<!--            <div>-->
+<!--                <ul>-->
+<!--                    {% for pk, choice in form.exercises.field.widget.choices %}-->
+<!--                    <li>-->
+<!--                        <label for="id_{{field.name}}_{{ forloop.counter0 }}">-->
+<!--                            <input id="id_{{field.name}}_{{ forloop.counter0 }}" name="{{field.name}}" type="checkbox" value="{{pk}}" />-->
+<!--                            {{ choice }}-->
+<!--                        </label>-->
+<!--                    </li>-->
+<!--                    {% endfor %}-->
+<!--                </ul>-->
+<!--            </div>-->
+<!--            </p>-->
             {% endfor %}
+
+
+            {{form.exercises.field.widget.choices}}
+
+
 
             <input type="submit" class="btn btn-success" value="Продолжить">
         </form>
