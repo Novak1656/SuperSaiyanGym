@@ -1,5 +1,4 @@
 from django.db import models
-from django.shortcuts import redirect
 from django.urls import reverse
 from django_unique_slugify import unique_slugify, slugify
 from unidecode import unidecode
@@ -38,6 +37,19 @@ class Exercises(models.Model):
         return reverse('exercises_detail', kwargs={'pk': self.pk})
 
 
+class ProgramCategory(models.Model):
+    title = models.CharField('Название', max_length=255)
+    created_at = models.DateTimeField('Дата создания', auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Категория тренировойной программы'
+        verbose_name_plural = 'Категории тренировойных программ'
+        ordering = ['-title']
+
+    def __str__(self):
+        return f"{self.title}"
+
+
 class TrainingProgram(models.Model):
     slug = models.SlugField('Слаг', max_length=255)
     title = models.CharField('Название', max_length=255)
@@ -46,14 +58,19 @@ class TrainingProgram(models.Model):
     training_count = models.IntegerField('Количество занятий', default=8)
     retry_exercises = models.IntegerField('Кол-во повторений упражнений')
     exercises = models.ManyToManyField(verbose_name='Упражнения', to=Exercises, related_name='train_program')
-    prise = models.DecimalField('Цена', max_digits=5, decimal_places=2)
+    category = models.ForeignKey(verbose_name='Категория', to=ProgramCategory, on_delete=models.PROTECT,
+                                 related_name='train_program', null=True)
+    author = models.ForeignKey(verbose_name='Автор', to='auth_app.User', on_delete=models.PROTECT,
+                               related_name='train_program', null=True)
+    moderation = models.CharField('Модератор', max_length=255, null=True)
+    is_published = models.BooleanField('Опубликовано', default=0)
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
     updated_at = models.DateTimeField('Дата изменения', auto_now=True)
 
     class Meta:
         verbose_name = 'Тренировочная программа'
         verbose_name_plural = 'Программы тренировок'
-        ordering = ['prise']
+        ordering = ['title']
 
     def __str__(self):
         return f"Program: {self.title}"

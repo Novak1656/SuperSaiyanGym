@@ -1,12 +1,13 @@
 from django.contrib import admin
-from .models import TrainingProgram, Exercises, ExercisesCategory, MyFavorites
+from .models import TrainingProgram, Exercises, ExercisesCategory, MyFavorites, ProgramCategory
 
 
 @admin.register(TrainingProgram)
 class TrainingAdmin(admin.ModelAdmin):
-    list_display = ('id', 'slug', 'title', 'created_at', 'updated_at',)
+    list_display = ('id', 'slug', 'title', 'category', 'author',
+                    'moderation', 'created_at', 'updated_at', 'is_published',)
     list_display_links = ('id', 'title', 'slug',)
-    list_filter = ('title', 'created_at',)
+    list_filter = ('title', 'created_at', 'category', 'is_published', 'author', 'moderation',)
     search_fields = ('title',)
     prepopulated_fields = {'slug': ('title',)}
     save_as = True
@@ -21,7 +22,7 @@ class ExercisesAdmin(admin.ModelAdmin):
     save_as = True
 
 
-@admin.register(ExercisesCategory)
+@admin.register(ExercisesCategory, ProgramCategory)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'title',)
     list_display_links = ('id', 'title',)

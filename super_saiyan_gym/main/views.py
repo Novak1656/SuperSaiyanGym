@@ -2,14 +2,13 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import F, Q
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-
 from .models import TrainingProgram, Exercises, MyFavorites
 from django.views.generic import DetailView, ListView
 
 
 @login_required
 def main(request):
-    train_programs = TrainingProgram.objects.all()[:3]
+    train_programs = TrainingProgram.objects.filter(is_published=True).all()[:3]
     context = {'train_programs': train_programs}
     return render(request, 'main/main.html', context)
 
@@ -21,7 +20,7 @@ class TrainProgramDetail(DetailView):
     login_url = reverse_lazy('login')
 
     def get_queryset(self):
-        return TrainingProgram.objects.prefetch_related('exercises').all()
+        return TrainingProgram.objects.filter(is_published=True).prefetch_related('exercises').all()
 
     def get_context_data(self, **kwargs):
         context = super(TrainProgramDetail, self).get_context_data(**kwargs)
@@ -42,7 +41,7 @@ class TrainProgramList(ListView):
     login_url = reverse_lazy('login')
 
     def get_queryset(self):
-        return TrainingProgram.objects.prefetch_related('exercises').all()
+        return TrainingProgram.objects.filter(is_published=True).prefetch_related('exercises').all()
 
 
 class ExercisesList(ListView):
