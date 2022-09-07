@@ -21,12 +21,12 @@
         {% for program in train_programs %}
         <div class="col">
             <div class="card mb-4 rounded-3 shadow-sm bg-dark border-warning">
-                <div class="card-header py-3">
-                    <h4 class="my-0 fw-normal">{{ program.title }}</h4>
+                <div class="card-header py-3 bg-warning text-dark">
+                    <h4 class="my-0 fw-normal">{{ program.category.title }}</h4>
                 </div>
                 <div class="card-body">
-                    <h1 class="card-title pricing-card-title">{{ program.prise }} RUB<small class="text-muted fw-light">/mo</small></h1>
-                    <p>{{ program.description }}</p>
+                    <h1 class="card-title pricing-card-title">{{ program.title }}</h1>
+                    <p>{{ program.description|slice:':50' }}...</p>
                     <a type="button" class="w-100 btn btn-lg btn-outline-primary" href="{{ program.get_absolute_url }}">Подробнее</a>
                 </div>
             </div>

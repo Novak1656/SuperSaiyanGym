@@ -19,6 +19,7 @@ urlpatterns = [
     path('moder_delete/exercise/<int:pk>/', ModerDeleteExercise.as_view(), name='moder_delete_exercise'),
     path('moder_delete/program_category/<int:pk>', ModerDeleteProgramCategory.as_view(), name='moder_delete_pro_cat'),
 
-    path('suggestions/<str:slug>/', get_suggestion, name='get_suggestion')
+    path('suggestions/<str:slug>/', get_suggestion, name='get_suggestion'),
+    path('suggestions/delete/<str:slug>/', delete_suggestion, name='delete_suggestion')
 ]
 

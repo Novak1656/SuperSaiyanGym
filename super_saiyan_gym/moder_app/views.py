@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
 from django.http import Http404
 from django.shortcuts import render, redirect
 from django.views.generic import CreateView, UpdateView, DeleteView
@@ -16,7 +18,7 @@ def index(request):
                'category_list': ExercisesCategory.objects.values('id', 'title').all(),
                'exercise_list': Exercises.objects.values('id', 'title').all(),
                'program_category_list': ProgramCategory.objects.values('id', 'title').all(),
-               'train_suggests': TrainingProgram.objects.filter(is_published=False).all()
+               'train_suggests': TrainingProgram.objects.select_related('author').filter(is_published=False).all()
                }
     return render(request, 'moder_app/index.html', context)
 
@@ -33,7 +35,22 @@ def get_suggestion(request, slug):
             return redirect('moder')
     else:
         form = ProgramForm(moder=request.user.username, instance=suggest)
-    return render(request, 'moder_app/suggestion.html', {'form': form, 'suggestion_title': suggest.title})
+    return render(request, 'moder_app/suggestion.html', {'form': form, 'suggestion_title': suggest.title, 'slug': slug})
+
+
+@login_required
+def delete_suggestion(request, slug):
+    if not request.user.is_staff:
+        raise Http404
+    t_program = TrainingProgram.objects.select_related('author').get(slug=slug)
+    send_mail('Ваша тренеровочная программа отклонена!',
+              f"Тренеровочная программа {t_program.title.upper()},"
+              f" опубликованная вами {t_program.created_at.strftime('%d.%m.%Y в %H:%M:%S')}"
+              f" не прошла модерацию и была оклонена.\n\n"
+              f" Вы можете попробовать заново предложить свою программу тренировок!",
+              settings.EMAIL_HOST_USER, [t_program.author.email])
+    t_program.delete()
+    return redirect('moder')
 
 
 class ModerCreateProgramView(AccessMixin, CreateView):

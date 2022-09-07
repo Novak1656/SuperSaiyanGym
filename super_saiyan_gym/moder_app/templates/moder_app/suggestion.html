@@ -12,7 +12,7 @@
             <div class="form-group">
                 {{ form.as_p }}
                 <input type="submit" class="btn btn-success" value="Опубликовать">
-                <a href="" class="btn btn-danger">Отклонить</a>
+                <a href="{% url 'delete_suggestion' slug %}" class="btn btn-danger">Отклонить</a>
             </div>
         </form>
     </div>

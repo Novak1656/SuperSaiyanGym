@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %} Создание своей программы {% endblock %}
+
+{% block content %}
+<div class="container text-warning border-warning">
+    <h1 class="f-3 border-bottom border-warning mb-3 mt-3">Предложите свой вариант тренировочной программы и возможно она появится в списке наших тренеровочных программ</h1>
+    <br>
+    <div class="text-center container">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.as_p }}
+                <input type="submit" class="btn btn-success" value="Отправить на проверку">
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

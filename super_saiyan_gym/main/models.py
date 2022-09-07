@@ -70,7 +70,7 @@ class TrainingProgram(models.Model):
     class Meta:
         verbose_name = 'Тренировочная программа'
         verbose_name_plural = 'Программы тренировок'
-        ordering = ['title']
+        ordering = ['-created_at']
 
     def __str__(self):
         return f"Program: {self.title}"

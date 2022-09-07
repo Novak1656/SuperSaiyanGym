@@ -6,6 +6,8 @@ urlpatterns = [
     path('training_programs/<str:slug>/', TrainProgramDetail.as_view(), name='program_detail'),
     path('training_programs/', TrainProgramList.as_view(), name='program_list'),
 
+    path('create_custom_program/', UserCreateTrainProgramView.as_view(), name='create_custom_program'),
+
     path('add_in_favorite/<int:pk>/', add_in_favorites, name='add_in_favorite'),
 
     path('exercises_list/', ExercisesList.as_view(), name='exercises_list'),

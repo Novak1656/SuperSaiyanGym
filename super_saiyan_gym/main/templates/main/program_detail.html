@@ -9,6 +9,7 @@
     <div class="rounded border border-warning">
         <br>
         <div class="container">
+            {% if program.author %}<h4 class="text-warning f-3">Автор: {{ program.author.username }}</h4>{% endif %}
             <ul>
                 <li><span>Кол-во занятий: {{ program.training_count }}</span></li>
                 <li><span>Занятий в неделю: {{ program.days_in_week }}</span></li>

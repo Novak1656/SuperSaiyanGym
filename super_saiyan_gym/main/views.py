@@ -1,15 +1,24 @@
+from random import randint
 from django.contrib.auth.decorators import login_required
-from django.db.models import F, Q
+from django.db.models import F, Q, Count
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from .models import TrainingProgram, Exercises, MyFavorites
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, CreateView
+from .forms import TrainingProgramForm
 
 
 @login_required
 def main(request):
-    train_programs = TrainingProgram.objects.filter(is_published=True).all()[:3]
-    context = {'train_programs': train_programs}
+    train_programs = TrainingProgram.objects.select_related('category').filter(is_published=True).all()
+    count = train_programs.aggregate(count=Count('id'))['count']
+    rand_trains = []
+    if len(train_programs) >= 3:
+        while len(rand_trains) != 3:
+            rand_i = randint(0, count - 1)
+            if train_programs[rand_i] not in rand_trains:
+                rand_trains.append(train_programs[rand_i])
+    context = {'train_programs': rand_trains}
     return render(request, 'main/main.html', context)
 
 
@@ -39,9 +48,25 @@ class TrainProgramList(ListView):
     template_name = 'main/programs_list.html'
     context_object_name = 'train_programs'
     login_url = reverse_lazy('login')
+    paginate_by = 3
 
     def get_queryset(self):
-        return TrainingProgram.objects.filter(is_published=True).prefetch_related('exercises').all()
+        return TrainingProgram.objects.filter(is_published=True).select_related('category', 'author').prefetch_related('exercises').all()
+
+
+class UserCreateTrainProgramView(CreateView):
+    model = TrainingProgram
+    success_url = reverse_lazy('after_create_user_program')
+    login_url = reverse_lazy('login')
+    template_name = 'main/program_user_create.html'
+    form_class = TrainingProgramForm
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.author = self.request.user
+        self.object.save()
+        form.save_m2m()
+        return render(self.request, 'main/after_create_user_program.html')
 
 
 class ExercisesList(ListView):

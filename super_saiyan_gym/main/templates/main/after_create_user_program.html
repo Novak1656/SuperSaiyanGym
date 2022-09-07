@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %} Завершение составления тренировочной программы {% endblock %}
+
+{% block content %}
+<div class="container text-warning border-warning">
+    <h1 class="display-4 border-bottom border-warning mb-3 mt-3 text-center">Спасибо, что хотите увеличить набор наших тренеровочных программ!</h1>
+    <h1 class="display-5 border-bottom border-warning mb-3 mt-3">Ваша тренеровочная программа отправлена на модерацию. После рассмотрения вашей программы вам на почту придёт результат проверки.</h1>
+    <a href="{% url 'program_list' %}" class="btn btn-outline-warning btn-lg text-center">К списку тренировочных программ</a>
+</div>
+{% endblock %}
