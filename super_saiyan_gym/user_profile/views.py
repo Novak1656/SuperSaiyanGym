@@ -2,7 +2,7 @@ import os
 
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView
@@ -15,7 +15,8 @@ from training_app.models import Achievements
 
 @login_required
 def profile(request):
-    context = {}
+    context = dict()
+    context['my_program'] = TrainingProgram.objects.filter(Q(author=request.user) & Q(is_published=True)).all()
     if request.user.training.all().exists():
         context['training'] = request.user.training.select_related('train_program').first()
     return render(request, 'user_profile/user_profile.html', context)

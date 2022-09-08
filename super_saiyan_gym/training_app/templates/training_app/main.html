@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load training_tags %}
 
 {% block title %} Додзё {% endblock %}
 
@@ -111,7 +112,7 @@
                                     <path d="m8.354 10.354 7-7a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z"/>
                                 </svg>
                                 {% endif %}
-                                {{ schedule.day }}
+                                {{ schedule.day|date_translate }}
                             </h5>
                         </div>
                         {% for category in schedule.exercises.all %}

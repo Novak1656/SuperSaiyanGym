@@ -1,28 +1,72 @@
 {% extends 'user_profile/base_user_profile.html' %}
+{% load profile_tags %}
 
 {% block title %}{{ block.super }} | {{ request.user.username }}{% endblock %}
 
 {% block content %}
-<div class="container text-warning">
-    <div>
-        <img src="{{ request.user.avatar.url }}" alt="404" width="100">
-    </div>
-    <div class="text-warning">
-        <h1 class="f-3">{{ request.user.username|title }}</h1>
-        <h2 class="f-5">Имя: {{ request.user.first_name }}</h2>
-        <h2 class="f-5">Фамилия: {{ request.user.last_name }}</h2>
-        <h2 class="f-5">Дата рождения: {{ request.user.date_of_birth }}</h2>
-        <h2 class="f-5">Пол: {{ request.user.sex }}</h2>
-        <h2 class="f-5">Вес: {{ request.user.weight }} kg.</h2>
-        <h2 class="f-5">Рост: {{ request.user.height }} sm.</h2>
-        {% if training %}
-        <h2 class="f-5">Тренеровочная программа: {{ training.train_program.title }}</h2>
-        {% endif %}
+<div class="container text-warning w-50">
+    <div class="row mt-3">
+        <div class="col-4 border border-warning rounded">
+            <div class="text-center mt-2">
+                <img src="{{ request.user.avatar.url }}" alt="404" width="250" class="rounded-3">
+            </div>
+            <div class="container border-top border-bottom border-warning mt-3 text-center">
+                <h1 class="fs-1">{{ request.user.username|title }}</h1>
+            </div>
+            <div class="container text-center mt-4 mb-3">
+                <a href="{% url 'profile_config' %}?conf=user_info" class="btn btn-outline-info btn-lg w-100">Настройки</a>
+            </div>
+        </div>
+        <div class="col border border-warning rounded ms-3">
+            <div class="container border-bottom border-warning">
+                <h2 class="display-6">{{ request.user.last_name }} {{ request.user.first_name }}</h2>
+            </div>
+            <div class="text-warning container">
+                <p class="fs-2">Дата рождения: {{ request.user.date_of_birth }}</p>
+                <p class="fs-2">Пол: {{ request.user.sex|sex_translate }}</p>
+                <p class="fs-2">Вес: {{ request.user.weight }} kg.</p>
+                <p class="fs-2">Рост: {{ request.user.height }} sm.</p>
+                <div class="border-top border-warning">
+                    {% if training %}
+                    <p class="fs-2">Текущая тренеровочная программа: <a href="{{ training.train_program.get_absolute_url }}" class="btn btn-outline-warning">{{ training.train_program.title }}</a></p>
+                    {% else %}
+                    <a href="{% url 'program_list' %}" class="btn btn-outline-warning w-100 btn-lg text-center mt-4">Выбрать тренировочную программу</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div>
-        <a href="{% url 'profile_config' %}?conf=user_info" class="btn btn-info">Настройки</a>
-        <a href="{% url 'favorite_exercises' %}" class="btn btn-success">Избранные упражнения</a>
+    <div class="row mt-3">
+        <div class="col-4 border border-warning rounded text-center">
+            <a href="{% url 'dojo' %}" class="btn btn-outline-warning w-75 mt-3 mb-2">Додзё</a>
+            <a href="{% url 'my_achievements' %}" class="btn btn-outline-warning w-75 mt-2 mb-2">Мои достижения</a>
+            <a href="{% url 'favorite_exercises' %}" class="btn btn-outline-warning w-75 mt-2 mb-3">Избранные упражнения</a>
+        </div>
+        <div class="col border border-warning rounded ms-3">
+            <div class="container border-bottom border-warning text-center">
+                <h2 class="display-6">Ваши тренировочные программы</h2>
+            </div>
+            <div class="mt-3">
+                {% if my_program %}
+                <ul>
+                    {% for program in my_program %}
+                    <li>
+                        <p class="fs-3">
+                            {{ program.title }} | Используют: {{ program.popularity }} чел. | Дата создания: {{ program.created_at|date:'d.m.Y' }}
+                            <a href="" class="btn btn-outline-danger">Удалить</a>
+                        </p>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="container text-center">
+                    <p class="fs-5">Ни одной вашей тренировочной программы не было опубликовано или вы их не создавали.</p>
+                    <a href="{% url 'create_custom_program' %}" class="btn btn-outline-warning btn-lg mb-3">Создать тренировочную программу</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
