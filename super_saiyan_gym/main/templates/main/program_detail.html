@@ -8,6 +8,9 @@
     <h1 class="f-5 mb-2 mt-2">{{ program.title }}</h1>
     <div class="rounded border border-warning">
         <br>
+        <div class="container text-center border-bottom border-warning">
+            <h5 class="mb-4">По данной программе тренеруются: {{ program.popularity }} чел.</h5>
+        </div>
         <div class="container">
             {% if program.author %}<h4 class="text-warning f-3">Автор: {{ program.author.username }}</h4>{% endif %}
             <ul>

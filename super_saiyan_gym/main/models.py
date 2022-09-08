@@ -60,6 +60,7 @@ class TrainingProgram(models.Model):
     exercises = models.ManyToManyField(verbose_name='Упражнения', to=Exercises, related_name='train_program')
     category = models.ForeignKey(verbose_name='Категория', to=ProgramCategory, on_delete=models.PROTECT,
                                  related_name='train_program', null=True)
+    popularity = models.IntegerField('Популярность', default=0)
     author = models.ForeignKey(verbose_name='Автор', to='auth_app.User', on_delete=models.PROTECT,
                                related_name='train_program', null=True)
     moderation = models.CharField('Модератор', max_length=255, null=True)

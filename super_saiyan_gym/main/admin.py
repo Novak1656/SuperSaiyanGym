@@ -5,9 +5,9 @@ from .models import TrainingProgram, Exercises, ExercisesCategory, MyFavorites, 
 @admin.register(TrainingProgram)
 class TrainingAdmin(admin.ModelAdmin):
     list_display = ('id', 'slug', 'title', 'category', 'author',
-                    'moderation', 'created_at', 'updated_at', 'is_published',)
+                    'moderation', 'popularity', 'created_at', 'updated_at', 'is_published',)
     list_display_links = ('id', 'title', 'slug',)
-    list_filter = ('title', 'created_at', 'category', 'is_published', 'author', 'moderation',)
+    list_filter = ('title', 'created_at', 'category', 'is_published', 'author', 'moderation',  'popularity',)
     search_fields = ('title',)
     prepopulated_fields = {'slug': ('title',)}
     save_as = True

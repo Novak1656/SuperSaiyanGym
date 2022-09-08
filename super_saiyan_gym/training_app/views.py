@@ -3,7 +3,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mass_mail
-from django.db.models import Q
+from django.db.models import Q, F
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
@@ -20,8 +20,7 @@ from datetime import datetime
 -поиск(по названию, автору),
 -фильтры(параметры программ, названию, дате добавления, авторам, популярности)
 
-3. В базе данных, модели Программ треш добавитть поле популярность.
-Там будет счётчик ко-ва пользоваттель, которые тренеруются по данной программе.
+3. При уменьшении показателей, выводить их тоже после тренировки
 
 4. Вынесити запуск асинхронных задач в отдельный management command
 """
@@ -154,6 +153,7 @@ def update_schedule(request, pk):
             schedule = form.save(commit=False)
             schedule.complete = False
             schedule.save()
+            form.save_m2m()
             return redirect('dojo')
     else:
         form = ScheduleForm(instance=schedule)
@@ -185,6 +185,9 @@ def training_conf(request):
 @login_required
 def create_training(request):
     training_program = TrainingProgram.objects.prefetch_related('exercises').get(slug=request.GET.get('slug'))
+    training_program.popularity = F('popularity') + 1
+    training_program.save()
+    training_program.refresh_from_db()
     Training.objects.create(user=request.user, train_program=training_program)
     exercises = training_program.exercises.all()
     for exercise in exercises:
@@ -196,7 +199,12 @@ def create_training(request):
 @login_required
 def delete_training(request):
     if request.user.training:
-        Training.objects.filter(user=request.user).delete()
+        training = Training.objects.filter(user=request.user).select_related('train_program').first()
+        training.train_program.popularity = F('popularity') - 1
+        training.train_program.save()
+        training.train_program.refresh_from_db()
+        training.delete()
+        TrainingProcess.objects.filter(user=request.user).delete()
     return redirect(request.META.get('HTTP_REFERER'))
 
 

@@ -48,7 +48,7 @@ class TrainProgramList(ListView):
     template_name = 'main/programs_list.html'
     context_object_name = 'train_programs'
     login_url = reverse_lazy('login')
-    paginate_by = 3
+    paginate_by = 5
 
     def get_queryset(self):
         return TrainingProgram.objects.filter(is_published=True).select_related('category', 'author').prefetch_related('exercises').all()
