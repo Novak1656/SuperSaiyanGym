@@ -7,4 +7,5 @@ urlpatterns =[
     path('favorite_exercises/', FavoriteList.as_view(), name='favorite_exercises'),
     path('my_achievements/', AchievementsList.as_view(), name='my_achievements'),
     path('delete_from_favorite/<int:pk>', delete_from_favorite, name='delete_from_favorite'),
+    path('delete_my_program/<str:slug>', delete_my_program, name='delete_my_program'),
 ]

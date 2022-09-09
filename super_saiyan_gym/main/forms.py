@@ -5,7 +5,7 @@ from .models import TrainingProgram, Exercises
 class TrainingProgramForm(forms.ModelForm):
     class Meta:
         model = TrainingProgram
-        exclude = ['id', 'slug', 'author', 'moderation', 'is_published', 'created_at', 'updated_at']
+        exclude = ['id', 'slug', 'author', 'moderation', 'is_published', 'created_at', 'updated_at', 'popularity']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control'}),

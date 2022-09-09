@@ -1,11 +1,12 @@
 {% extends 'main/base_main.html' %}
 {% load static %}
+{% load main_tags %}
 
 {% block title %}Тренировочные программы{% endblock %}
 
 {% block content %}
 <div class="container text-warning">
-    <h1 class="f-5 mb-2 mt-2">Наши тренировочные программы</h1>
+    <h1 class="f-5 mb-2 mt-2">{{ page_header }}</h1>
     <div class="border-top border-warning">
         <div class="row">
             <div class="col">
@@ -42,15 +43,22 @@
 
             <div class="col-4">
                 <div class="border border-warning rounded mt-3 container">
-                    <form role="search" method="get" action="" class="mt-2">
-                        <input class="form-control" type="search" name="search_word" placeholder="Поиск по названию или автору" aria-label="Search">
+                    <div class="border-bottom border-warning">
+                        <h2 class="text-center mb-2">Тренировочные программы</h2>
+                    </div>
+                    <br>
+                    <h4>Всего программ: {{ page_obj.paginator.count }}</h4>
+                    <form role="search" method="get" action="{% url 'program_list_search' %}" class="mt-2">
+                        <input class="form-control" type="search" name="search_word" placeholder="Search" aria-label="Search">
                     </form>
                     <div class="row mt-2">
-                        <div class="col">
-                            <h1>Categories</h1>
+                        <div class="col text-center">
+                            <h1 class="fs-3">Categories</h1>
+                            {% get_program_category_list %}
                         </div>
-                        <div class="col border-start border-warning">
-                            <h1>Filters</h1>
+                        <div class="col border-start border-warning text-center">
+                            <h1 class="fs-3">Filters</h1>
+                            {% get_program_filter_list %}
                         </div>
                     </div>
                 </div>

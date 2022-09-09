@@ -3,8 +3,9 @@ from .views import *
 
 urlpatterns = [
     path('', main, name='main'),
-    path('training_programs/<str:slug>/', TrainProgramDetail.as_view(), name='program_detail'),
+    path('training_programs/program/<str:slug>/', TrainProgramDetail.as_view(), name='program_detail'),
     path('training_programs/', TrainProgramList.as_view(), name='program_list'),
+    path('training_programs/search/', TrainProgramSearchList.as_view(), name='program_list_search'),
 
     path('create_custom_program/', UserCreateTrainProgramView.as_view(), name='create_custom_program'),
 

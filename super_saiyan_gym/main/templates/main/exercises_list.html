@@ -31,7 +31,9 @@
             </div>
             <div class="col border-start border-warning mt-3">
                 <div class="container">
-                    <h2 class="border-bottom text-center border-warning">Раздел упражнений</h2>
+                    <div class="border-bottom border-warning">
+                        <h2 class="text-center mb-2">Раздел упражнений</h2>
+                    </div>
                     <br>
                     <h4>Всего упражнений: {{ page_obj.paginator.count }}</h4>
                     <form role="search" method="get" action="{% url 'exercises_search_list' %}">

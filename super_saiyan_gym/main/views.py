@@ -49,9 +49,29 @@ class TrainProgramList(ListView):
     context_object_name = 'train_programs'
     login_url = reverse_lazy('login')
     paginate_by = 5
+    extra_context = {'page_header': 'Наши тренировочные программы'}
 
     def get_queryset(self):
         return TrainingProgram.objects.filter(is_published=True).select_related('category', 'author').prefetch_related('exercises').all()
+
+
+class TrainProgramSearchList(ListView):
+    model = TrainingProgram
+    template_name = 'main/programs_list.html'
+    login_url = reverse_lazy('login')
+    context_object_name = 'train_programs'
+    paginate_by = 2
+
+    def get_queryset(self):
+        return TrainingProgram.objects.filter(
+            Q(is_published=True) & Q(title__icontains=self.request.GET.get('search_word'))
+        ).select_related('category', 'author').prefetch_related('exercises').all()
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(TrainProgramSearchList, self).get_context_data(**kwargs)
+        context['page_header'] = f"Результат поиска: {self.request.GET.get('search_word')}"
+        context['url_arg_cur_filter'] = f"&search_word={self.request.GET.get('search_word')}"
+        return context
 
 
 class UserCreateTrainProgramView(CreateView):

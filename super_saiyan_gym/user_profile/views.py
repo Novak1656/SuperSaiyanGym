@@ -109,3 +109,11 @@ def delete_from_favorite(request, pk):
     favorite = MyFavorites.objects.get(pk=pk)
     favorite.delete()
     return redirect('favorite_exercises')
+
+
+@login_required
+def delete_my_program(request, slug):
+    my_t_program = TrainingProgram.objects.filter(Q(author=request.user) & Q(slug=slug)).first()
+    if my_t_program:
+        my_t_program.delete()
+    return redirect('profile')

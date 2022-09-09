@@ -54,7 +54,7 @@
                     <li>
                         <p class="fs-3">
                             {{ program.title }} | Используют: {{ program.popularity }} чел. | Дата создания: {{ program.created_at|date:'d.m.Y' }}
-                            <a href="" class="btn btn-outline-danger">Удалить</a>
+                            <a href="{% url 'delete_my_program' program.slug %}" class="btn btn-outline-danger">Удалить</a>
                         </p>
                     </li>
                     {% endfor %}

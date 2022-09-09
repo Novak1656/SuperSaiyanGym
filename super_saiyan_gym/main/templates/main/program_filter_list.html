@@ -1,0 +1,25 @@
+{% for filter, label in filter_list %}
+<div class="row border-top border-warning text-start">
+    {% if filter == cur_filter %}
+    {% if search_word %}
+    <a class="dropdown-item active" class="text-warning text-decoration-none mt-1 mb-1 text-start" href="{{ backup_url }}?search_word={{ search_word }}">
+        {{ label }}
+    </a>
+    {% else %}
+    <a class="dropdown-item active" class="text-warning text-decoration-none mt-1 mb-1 text-start" href="{{ backup_url }}">
+        {{ label }}
+    </a>
+    {% endif %}
+    {% else %}
+    {% if search_word %}
+    <a class="dropdown-item" class="text-warning text-decoration-none mt-1 mb-1 text-start" href="?filter_by={{ filter }}&search_word={{ search_word }}">
+        {{ label }}
+    </a>
+    {% else %}
+    <a class="dropdown-item" class="text-warning text-decoration-none mt-1 mb-1 text-start" href="?filter_by={{ filter }}">
+        {{ label }}
+    </a>
+    {% endif %}
+    {% endif %}
+</div>
+{% endfor %}
