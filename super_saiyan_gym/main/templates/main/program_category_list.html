@@ -1,21 +1,27 @@
-
-<a class="dropdown-item text-start" href="{% url 'program_list' %}">
-    All <span class="badge bg-danger text-white">{{ program_cnt }}</span>
-</a>
-{% for category in category_list|slice:':2' %}
-<div class="row border-top border-warning">
-    <a class="text-warning text-decoration-none mt-1 mb-1 text-start" href="{% url 'exercises_category_list' category.title %}">
-        {{ category.title }} <span class="badge bg-danger text-white">{{ category.cnt }}</span>
-    </a>
-</div>
-{% endfor %}
-<div class="collapse" id="categories">
-    {% for category in category_list|slice:'2:' %}
-    <div class="row border-top border-warning">
-        <a class="text-warning text-decoration-none mt-1 mb-1 text-start" href="{% url 'exercises_category_list' category.title %}">
+<div class="text-center container">
+    <div class="row">
+        <a class="btn btn-outline-warning mt-1 mb-1 btn-sm" href="{% url 'program_list' %}">
+            All <span class="badge bg-danger text-white">{{ program_cnt }}</span>
+        </a>
+    </div>
+    {% for category in category_list|slice:':2' %}
+    <div class="row">
+        <a class="btn btn-outline-warning mt-1 mb-1 btn-sm" href="{% url 'program_list_cat' category.title %}">
             {{ category.title }} <span class="badge bg-danger text-white">{{ category.cnt }}</span>
         </a>
     </div>
     {% endfor %}
+    <div class="collapse" id="categories">
+        {% for category in category_list|slice:'2:' %}
+        <div class="row">
+            <a class="btn btn-outline-warning mt-1 mb-1 btn-sm" href="{% url 'program_list_cat' category.title %}">
+                {{ category.title }} <span class="badge bg-danger text-white">{{ category.cnt }}</span>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="row mb-2">
+        <button class="btn btn-outline-warning btn-sm w-100" data-bs-toggle="collapse" data-bs-target="#categories">...</button>
+    </div>
 </div>
-<button class="btn btn-outline-warning btn-block btn-sm" data-bs-toggle="collapse" data-bs-target="#categories">...</button>
+

@@ -6,7 +6,7 @@
 
 {% block content %}
 <div class="container text-warning">
-    <h1 class="f-5 mb-2 mt-2">{{ page_header }}</h1>
+    <h1 class="f-5 mb-2 mt-2">Программы по категории: {{ category }}</h1>
     <div class="border-top border-warning">
         <div class="row">
             <div class="col">
@@ -48,7 +48,7 @@
                     </div>
                     <br>
                     <h4>Всего программ: {{ page_obj.paginator.count }}</h4>
-                    <form role="search" method="get" action="{% url 'program_list_search' %}" class="mt-2">
+                    <form role="search" method="get" action="{% url 'program_list_cat_search' category %}" class="mt-2">
                         <input class="form-control" type="search" name="search_word" placeholder="Search" aria-label="Search">
                     </form>
                     <div class="row mt-2">

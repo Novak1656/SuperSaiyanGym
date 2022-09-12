@@ -12,19 +12,6 @@ from .forms import ScheduleForm, BaseArticleFormSet
 from django.forms import formset_factory
 from datetime import datetime
 
-"""
-1. Реализовать функцию подбора программы по следующим параметрам: рост, вес, возраст
-Добавить программам категорию: похудение, набор массы, стандартный, фитнес
-
-2. Реализовать в разделе тренировочных программ следующие фичи:
--поиск(по названию, автору),
--фильтры(параметры программ, названию, дате добавления, авторам, популярности)
-
-4. Вынесити запуск асинхронных задач в отдельный management command
-
-+5. Добавить возможность пользователям удалять программы авторами, которых они являются
-"""
-
 
 def mailing():
     users_trains = Training.objects.prefetch_related('schedules').select_related('user').filter(mailing=True).all()

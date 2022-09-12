@@ -48,11 +48,21 @@ class TrainProgramList(ListView):
     template_name = 'main/programs_list.html'
     context_object_name = 'train_programs'
     login_url = reverse_lazy('login')
-    paginate_by = 5
-    extra_context = {'page_header': 'Наши тренировочные программы'}
+    paginate_by = 10
+    extra_context = {'page_header': 'Наши тренировочные программы', 'backup_url': reverse_lazy('program_list')}
 
     def get_queryset(self):
-        return TrainingProgram.objects.filter(is_published=True).select_related('category', 'author').prefetch_related('exercises').all()
+        train_program = TrainingProgram.objects.\
+            filter(is_published=True).select_related('category', 'author').prefetch_related('exercises').all()
+        if self.request.GET.get('filter_by'):
+            return train_program.order_by(f"-{self.request.GET.get('filter_by')}")
+        return train_program
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(TrainProgramList, self).get_context_data(**kwargs)
+        if self.request.GET.get('filter_by'):
+            context['cur_filter'] = self.request.GET.get('filter_by')
+        return context
 
 
 class TrainProgramSearchList(ListView):
@@ -60,17 +70,77 @@ class TrainProgramSearchList(ListView):
     template_name = 'main/programs_list.html'
     login_url = reverse_lazy('login')
     context_object_name = 'train_programs'
-    paginate_by = 2
+    paginate_by = 10
 
     def get_queryset(self):
-        return TrainingProgram.objects.filter(
+        train_program = TrainingProgram.objects.filter(
             Q(is_published=True) & Q(title__icontains=self.request.GET.get('search_word'))
         ).select_related('category', 'author').prefetch_related('exercises').all()
+        if self.request.GET.get('filter_by'):
+            return train_program.order_by(f"-{self.request.GET.get('filter_by')}")
+        return train_program
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(TrainProgramSearchList, self).get_context_data(**kwargs)
         context['page_header'] = f"Результат поиска: {self.request.GET.get('search_word')}"
         context['url_arg_cur_filter'] = f"&search_word={self.request.GET.get('search_word')}"
+        context['search_word'] = self.request.GET.get('search_word')
+        if self.request.GET.get('filter_by'):
+            context['backup_url'] = self.request.path
+            context['cur_filter'] = self.request.GET.get('filter_by')
+            context['url_arg_cur_filter'] += f"&filter_by={self.request.GET.get('filter_by')}"
+        return context
+
+
+class TrainProgramListByCategory(ListView):
+    model = TrainingProgram
+    template_name = 'main/programs_list_by_category.html'
+    context_object_name = 'train_programs'
+    login_url = reverse_lazy('login')
+    paginate_by = 10
+
+    def get_queryset(self):
+        train_program = TrainingProgram.objects.select_related('category', 'author').prefetch_related('exercises').\
+            filter(Q(is_published=True) & Q(category__title=self.kwargs.get('category'))).all()
+        if self.request.GET.get('filter_by'):
+            return train_program.order_by(f"-{self.request.GET.get('filter_by')}")
+        return train_program
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(TrainProgramListByCategory, self).get_context_data(**kwargs)
+        context['category'] = self.kwargs.get("category")
+        if self.request.GET.get('filter_by'):
+            context['backup_url'] = self.request.path
+            context['cur_filter'] = self.request.GET.get('filter_by')
+            context['url_arg_cur_filter'] = f"&filter_by={self.request.GET.get('filter_by')}"
+        return context
+
+
+class TrainProgramSearchListByCategory(ListView):
+    model = TrainingProgram
+    template_name = 'main/programs_list_by_category.html'
+    login_url = reverse_lazy('login')
+    context_object_name = 'train_programs'
+    paginate_by = 10
+
+    def get_queryset(self):
+        train_program = TrainingProgram.objects.select_related('category', 'author').prefetch_related('exercises').\
+            filter(Q(is_published=True)
+                   & Q(title__icontains=self.request.GET.get('search_word'))
+                   & Q(category__title=self.kwargs.get('category'))).all()
+        if self.request.GET.get('filter_by'):
+            return train_program.order_by(f"-{self.request.GET.get('filter_by')}")
+        return train_program
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(TrainProgramSearchListByCategory, self).get_context_data(**kwargs)
+        context['category'] = self.kwargs.get("category")
+        context['url_arg_cur_filter'] = f"&search_word={self.request.GET.get('search_word')}"
+        context['search_word'] = self.request.GET.get('search_word')
+        if self.request.GET.get('filter_by'):
+            context['backup_url'] = self.request.path
+            context['cur_filter'] = self.request.GET.get('filter_by')
+            context['url_arg_cur_filter'] += f"&filter_by={self.request.GET.get('filter_by')}"
         return context
 
 

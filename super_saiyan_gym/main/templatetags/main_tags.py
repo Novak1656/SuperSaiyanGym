@@ -25,7 +25,7 @@ def get_filter_list(cur_filter=None, backup_url=None, search_word=None):
 
 @register.inclusion_tag('main/program_category_list.html')
 def get_program_category_list():
-    category = ProgramCategory.objects.annotate(cnt=Count('train_program')).order_by('-cnt').all()
+    category = ProgramCategory.objects.annotate(cnt=Count('train_program')).filter(cnt__gt=0).order_by('-cnt').all()
     program_cnt = TrainingProgram.objects.filter(is_published=True).all().count()
     return {'category_list': category, 'program_cnt': program_cnt}
 
